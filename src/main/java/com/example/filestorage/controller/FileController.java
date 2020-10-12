@@ -28,8 +28,8 @@ public class FileController {
         return fileService.getById(id);
     }
 
-    @PostMapping
-    public ResponseEntity<String> uploadFile(@RequestBody MyFile myFile) {
+    @PostMapping(consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> uploadFile(@RequestBody MyFile myFile) {
         if (fileService.uploadFile(myFile)) {
             return new ResponseEntity<>("ID:" + myFile.getId(), HttpStatus.OK);
         } else {
@@ -40,17 +40,22 @@ public class FileController {
     @DeleteMapping("/{id:\\d+}")
     public ResponseEntity<Object> deleteFile(@PathVariable("id") Long id) {
         if (fileService.deleteById(id)) {
-            return new ResponseEntity("\"success\": true", HttpStatus.OK);
+            return new ResponseEntity("{\"success\": true}", HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(" \"success\": false,\n" +
-                    "  \"error\": \"file not found\"\n", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("{\n \"success\": false,\n" +
+                    "  \"error\": \"file not found\"\n}\n", HttpStatus.NOT_FOUND);
         }
     }
 
-    @PostMapping("/{id:\\d+}/tags")
+    @PostMapping(value = "/{id:\\d+}/tags", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> assignTagsToFile(@PathVariable("id") Long id,
-                                 @RequestParam("tags") String[] tags) {
-        return ResponseEntity.ok().build();
+                                 @RequestBody String[] tags) {
+        if (fileService.assignTags(id, tags)) {
+            return new ResponseEntity<>("{\"success\": true}", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("{\n \"success\": false,\n" +
+                    "  \"error\": \"file not found\"\n}\n", HttpStatus.NOT_FOUND);
+        }
     }
 
     @DeleteMapping("/{id}/tags")

@@ -19,16 +19,9 @@ public class ElasticConfiguration {
 
     @Bean
     public RestHighLevelClient client() {
-        RestHighLevelClient client = new RestHighLevelClient(
+        return new RestHighLevelClient(
                 RestClient.builder(
                         new HttpHost("localhost", 9200, "http")));
-//        try {
-//            client.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-        return client;
     }
 
     @Bean

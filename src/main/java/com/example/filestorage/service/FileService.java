@@ -5,6 +5,7 @@ import com.example.filestorage.repository.FileRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -17,17 +18,31 @@ public class FileService {
     }
 
     public boolean uploadFile(MyFile myFile) {
-        if (myFile != null && repository.existsById(myFile.getId())) {
+        if (myFile != null) {
             if (myFile.getName() != null && !myFile.getName().isBlank() && myFile.getSize() > 0) {
+                repository.save(myFile);
                 return true;
             }
         }
         return false;
     }
 
+    public boolean assignTags(Long id, String[] tags) {
+        if(repository.findById(id).isPresent()) {
+            MyFile currentFile = repository.findById(id).get();
+
+            currentFile.setTags(Arrays.asList(tags));
+            repository.save(currentFile);
+
+            return true;
+        }
+        return false;
+    }
+
     public List<MyFile> getAll() {
         List<MyFile> resultList = new ArrayList<>();
-        repository.findAll().forEach(t -> resultList.add(t));
+        Iterable<MyFile>  list = repository.findAll();
+        list.forEach(resultList::add);
 
         return resultList;
     }

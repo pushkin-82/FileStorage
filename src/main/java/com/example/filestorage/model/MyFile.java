@@ -3,6 +3,7 @@ package com.example.filestorage.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -61,7 +62,7 @@ public class MyFile {
         return tags;
     }
 
-    public void setTags(Set<String> tags) {
+    public void setTags(Collection<String> tags) {
         this.tags.addAll(tags);
     }
 

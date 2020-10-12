@@ -24,7 +24,6 @@ public class Loader {
     @Transactional
     public void loadAll() {
         operations.indexOps(MyFile.class);
-//        fileRepository.save(new MyFile(123L, "qwe", 12000L));
         fileRepository.saveAll(getData());
     }
 
