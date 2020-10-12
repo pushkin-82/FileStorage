@@ -39,7 +39,12 @@ public class FileController {
 
     @DeleteMapping("/{id:\\d+}")
     public ResponseEntity<Object> deleteFile(@PathVariable("id") Long id) {
-        return ResponseEntity.ok().build();
+        if (fileService.deleteById(id)) {
+            return new ResponseEntity("\"success\": true", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(" \"success\": false,\n" +
+                    "  \"error\": \"file not found\"\n", HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/{id:\\d+}/tags")

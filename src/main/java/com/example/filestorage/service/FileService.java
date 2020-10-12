@@ -35,4 +35,13 @@ public class FileService {
     public MyFile getById(Long id) {
         return repository.findById(id).get();
     }
+
+    public boolean deleteById(Long id) {
+        if (repository.existsById(id)) {
+            repository.deleteById(id);
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
