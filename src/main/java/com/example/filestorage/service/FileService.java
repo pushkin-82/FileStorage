@@ -31,4 +31,8 @@ public class FileService {
 
         return resultList;
     }
+
+    public MyFile getById(Long id) {
+        return repository.findById(id).get();
+    }
 }

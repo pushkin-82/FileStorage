@@ -2,13 +2,14 @@ package com.example.filestorage.controller;
 
 import com.example.filestorage.model.MyFile;
 import com.example.filestorage.service.FileService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/file")
+@RequestMapping(path = "/file")
 public class FileController {
 
     private final FileService fileService;
@@ -22,12 +23,17 @@ public class FileController {
         return fileService.getAll();
     }
 
+    @GetMapping("/{id:\\d+}")
+    public MyFile getById(@PathVariable("id") Long id) {
+        return fileService.getById(id);
+    }
+
     @PostMapping
-    public ResponseEntity<Object> uploadFile(@RequestBody MyFile myFile) {
+    public ResponseEntity<String> uploadFile(@RequestBody MyFile myFile) {
         if (fileService.uploadFile(myFile)) {
-            return ResponseEntity.ok().build();
+            return new ResponseEntity<>("ID:" + myFile.getId(), HttpStatus.OK);
         } else {
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity<>("Success: false, error: error", HttpStatus.BAD_REQUEST );
         }
     }
 
