@@ -96,4 +96,14 @@ public class MyFile {
     public int hashCode() {
         return Objects.hash(id, name, size);
     }
+
+    @Override
+    public String toString() {
+        return  "\n      {\n" +
+                "          \"id\": \"" + id + "\",\n" +
+                "          \"name\": \"" + name + "\",\n" +
+                "          \"size\": " + size + ",\n" +
+                "          \"tags\": " + tags + "\n" +
+                "       }";
+    }
 }

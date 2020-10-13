@@ -68,16 +68,16 @@ public class FileService {
         return false;
     }
 
-    public List<MyFile> getAllWithPaging(Pageable pageable) {
+    public List<MyFile> getAll() {
         List<MyFile> resultList = new ArrayList<>();
-        Iterable<MyFile>  list = repository.findAll(pageable);
+        Iterable<MyFile>  list = repository.findAll();
         list.forEach(resultList::add);
 
         return resultList;
     }
 
-    public List<MyFile> getAllWithFilterAndPaging(String[] tags, Pageable pageable) {
-        Iterable<MyFile>  list = repository.findAll(pageable);
+    public List<MyFile> getAllWithFilter(String[] tags) {
+        Iterable<MyFile>  list = repository.findAll();
 
         List<MyFile> resultList = new ArrayList<>();
 

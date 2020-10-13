@@ -2,6 +2,8 @@ package com.example.filestorage.controller;
 
 import com.example.filestorage.model.MyFile;
 import com.example.filestorage.service.FileService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -83,17 +85,23 @@ public class FileController {
         String[] filterTags = tags.orElse(new String[0]);
         int currentPage = page.orElse(DEFAULT_PAGE);
         int pageSize = size.orElse(DEFAULT_PAGE_SIZE);
-        Pageable pageable = PageRequest.of(currentPage, pageSize);
 
         List<MyFile> resultList;
         if (filterTags.length == 0) {
-            resultList = fileService.getAllWithPaging(pageable);
+            resultList = fileService.getAll();
         } else {
-            resultList = fileService.getAllWithFilterAndPaging(filterTags, pageable);
+            resultList = fileService.getAllWithFilter(filterTags);
         }
 
+        int total = resultList.size();
+        Pageable pageable = PageRequest.of(currentPage, pageSize);
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), total);
+        Page<MyFile> myFilePage = new PageImpl<>(resultList.subList(start, end), pageable, total);
+
         return new ResponseEntity<>("{\n" +
-                "   \"total\": " + resultList.size() + ",\n" +
-                "   \"page\": [\n" + resultList + "\n]\n}\n", HttpStatus.OK);
+                "   \"total\": " + total + ",\n" +
+                "   \"page\": " + myFilePage.getContent() + "\n}\n", HttpStatus.OK);
     }
 }
