@@ -12,7 +12,7 @@ import java.util.Set;
 public class MyFile {
 
     @Id
-    private Long id;
+    private String id;
 
     private String name;
 
@@ -28,17 +28,17 @@ public class MyFile {
         this.size = size;
     }
 
-    public MyFile(Long id, String name, Long size) {
+    public MyFile(String id, String name, Long size) {
         this.id = id;
         this.name = name;
         this.size = size;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

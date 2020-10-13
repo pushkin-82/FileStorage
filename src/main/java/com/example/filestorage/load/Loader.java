@@ -29,9 +29,9 @@ public class Loader {
 
     private List<MyFile> getData() {
         List<MyFile> myFiles = new ArrayList<>();
-        myFiles.add(new MyFile(123L, "qwe", 12000L));
-        myFiles.add(new MyFile(124L, "wer", 123123L));
-        myFiles.add(new MyFile(125L, "erty", 12L));
+        myFiles.add(new MyFile("123", "qwe", 12000L));
+        myFiles.add(new MyFile("124", "wer", 123123L));
+        myFiles.add(new MyFile("125", "erty", 12L));
         return myFiles;
     }
 }
