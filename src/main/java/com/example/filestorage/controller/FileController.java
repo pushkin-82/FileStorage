@@ -2,15 +2,22 @@ package com.example.filestorage.controller;
 
 import com.example.filestorage.model.MyFile;
 import com.example.filestorage.service.FileService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/file")
 public class FileController {
+
+    private static final int DEFAULT_PAGE = 0;
+
+    private static final int DEFAULT_PAGE_SIZE = 10;
 
     private final FileService fileService;
 
@@ -18,13 +25,8 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    @GetMapping
-    public List<MyFile> getAll() {
-        return fileService.getAll();
-    }
-
-    @GetMapping("/{id:\\d+}")
-    public MyFile getById(@PathVariable("id") Long id) {
+    @GetMapping("/{id}")
+    public MyFile getById(@PathVariable("id") String id) {
         return fileService.getById(id);
     }
 
@@ -40,8 +42,8 @@ public class FileController {
         }
     }
 
-    @DeleteMapping("/{id:\\d+}")
-    public ResponseEntity<Object> deleteFile(@PathVariable("id") Long id) {
+    @DeleteMapping(value = "/{id}", produces = "application/json")
+    public ResponseEntity<Object> deleteFile(@PathVariable("id") String id) {
         if (fileService.deleteById(id)) {
             return new ResponseEntity("{\"success\": true}", HttpStatus.OK);
         } else {
@@ -50,8 +52,8 @@ public class FileController {
         }
     }
 
-    @PostMapping(value = "/{id:\\d+}/tags", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> assignTags(@PathVariable("id") Long id,
+    @PostMapping(value = "/{id}/tags", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> assignTags(@PathVariable("id") String id,
                                              @RequestBody String[] tags) {
         if (fileService.assignTags(id, tags)) {
             return new ResponseEntity<>("{\"success\": true}", HttpStatus.OK);
@@ -61,8 +63,8 @@ public class FileController {
         }
     }
 
-    @DeleteMapping(value = "/{id:\\d+}/tags", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> removeTags(@PathVariable("id") Long id,
+    @DeleteMapping(value = "/{id}/tags", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> removeTags(@PathVariable("id") String id,
                                              @RequestBody String[] tags) {
         if (fileService.removeTags(id, tags)) {
             return new ResponseEntity<>("{\"success\": true}", HttpStatus.OK);
@@ -74,10 +76,24 @@ public class FileController {
         }
     }
 
-//    @GetMapping
-//    public ResponseEntity<Object> getFiles(@RequestParam("tags") String[] tags,
-//                         @RequestParam("page") Long page,
-//                         @RequestParam("size") Long size) {
-//        return ResponseEntity.ok().build();
-//    }
+    @GetMapping(produces = "application/json")
+    public ResponseEntity<Object> getFilesWithFilter(@RequestParam("tags") Optional<String[]> tags,
+                                                     @RequestParam("page") Optional<Integer> page,
+                                                     @RequestParam("size") Optional<Integer> size) {
+        String[] filterTags = tags.orElse(new String[0]);
+        int currentPage = page.orElse(DEFAULT_PAGE);
+        int pageSize = size.orElse(DEFAULT_PAGE_SIZE);
+        Pageable pageable = PageRequest.of(currentPage, pageSize);
+
+        List<MyFile> resultList;
+        if (filterTags.length == 0) {
+            resultList = fileService.getAllWithPaging(pageable);
+        } else {
+            resultList = fileService.getAllWithFilterAndPaging(filterTags, pageable);
+        }
+
+        return new ResponseEntity<>("{\n" +
+                "   \"total\": " + resultList.size() + ",\n" +
+                "   \"page\": [\n" + resultList + "\n]\n}\n", HttpStatus.OK);
+    }
 }

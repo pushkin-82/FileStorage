@@ -2,14 +2,14 @@ package com.example.filestorage.service;
 
 import com.example.filestorage.model.MyFile;
 import com.example.filestorage.repository.FileRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class FileService {
@@ -43,7 +43,7 @@ public class FileService {
         return Optional.empty();
     }
 
-    public boolean assignTags(Long id, String[] tags) {
+    public boolean assignTags(String id, String[] tags) {
         if(repository.findById(id).isPresent()) {
             MyFile currentFile = repository.findById(id).get();
 
@@ -55,8 +55,7 @@ public class FileService {
         return false;
     }
 
-
-    public boolean removeTags(Long id, String[] tags) {
+    public boolean removeTags(String id, String[] tags) {
         if (repository.findById(id).isPresent()) {
             MyFile current = repository.findById(id).get();
 
@@ -69,19 +68,31 @@ public class FileService {
         return false;
     }
 
-    public List<MyFile> getAll() {
+    public List<MyFile> getAllWithPaging(Pageable pageable) {
         List<MyFile> resultList = new ArrayList<>();
-        Iterable<MyFile>  list = repository.findAll();
+        Iterable<MyFile>  list = repository.findAll(pageable);
         list.forEach(resultList::add);
 
         return resultList;
     }
 
-    public MyFile getById(Long id) {
+    public List<MyFile> getAllWithFilterAndPaging(String[] tags, Pageable pageable) {
+        Iterable<MyFile>  list = repository.findAll(pageable);
+
+        List<MyFile> resultList = new ArrayList<>();
+
+        list.forEach(resultList::add);
+
+        return resultList
+                .stream()
+                .filter(file -> file.getTags().containsAll(Arrays.asList(tags))).collect(Collectors.toList());
+    }
+
+    public MyFile getById(String id) {
         return repository.findById(id).get();
     }
 
-    public boolean deleteById(Long id) {
+    public boolean deleteById(String id) {
         if (repository.existsById(id)) {
             repository.deleteById(id);
             return true;
