@@ -30,10 +30,13 @@ public class FileController {
 
     @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> uploadFile(@RequestBody MyFile myFile) {
-        if (fileService.uploadFile(myFile)) {
-            return new ResponseEntity<>("ID:" + myFile.getId(), HttpStatus.OK);
+        if (fileService.uploadFile(myFile).isEmpty()) {
+            return new ResponseEntity<>("\"ID\": \"" + myFile.getId() + "\"" , HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("Success: false, error: error", HttpStatus.BAD_REQUEST );
+            return new ResponseEntity<>("{\n" +
+                    "  \"success\": false,\n" +
+                    "  \"error\": \"" + fileService.uploadFile(myFile).get() + "\"\n" +
+                    "}\n", HttpStatus.BAD_REQUEST );
         }
     }
 

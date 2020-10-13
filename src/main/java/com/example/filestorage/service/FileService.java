@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class FileService {
@@ -17,14 +20,27 @@ public class FileService {
         this.repository = repository;
     }
 
-    public boolean uploadFile(MyFile myFile) {
-        if (myFile != null) {
-            if (myFile.getName() != null && !myFile.getName().isBlank() && myFile.getSize() > 0) {
-                repository.save(myFile);
-                return true;
-            }
+    public Optional<String> uploadFile(MyFile myFile) {
+        String error;
+
+        if (myFile == null) {
+            error = "file cannot be null";
+        } else if (myFile.getName() == null || myFile.getName().isBlank()) {
+            error = "Name should not be empty";
+        } else if (!myFile.getName().matches("\\S+\\.[a-z]{3,4}")) {
+            error = "File should have proper extension";
+        } else if (myFile.getSize() <= 0) {
+            error = "File size should be positive number";
+        } else {
+            error = "";
         }
-        return false;
+
+        if (!error.isBlank()) {
+            return Optional.of(error);
+        }
+
+        repository.save(myFile);
+        return Optional.empty();
     }
 
     public boolean assignTags(Long id, String[] tags) {
