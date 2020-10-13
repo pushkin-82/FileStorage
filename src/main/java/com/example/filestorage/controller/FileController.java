@@ -48,8 +48,8 @@ public class FileController {
     }
 
     @PostMapping(value = "/{id:\\d+}/tags", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> assignTagsToFile(@PathVariable("id") Long id,
-                                 @RequestBody String[] tags) {
+    public ResponseEntity<Object> assignTags(@PathVariable("id") Long id,
+                                             @RequestBody String[] tags) {
         if (fileService.assignTags(id, tags)) {
             return new ResponseEntity<>("{\"success\": true}", HttpStatus.OK);
         } else {
@@ -58,10 +58,17 @@ public class FileController {
         }
     }
 
-    @DeleteMapping("/{id}/tags")
-    public ResponseEntity<Object> deleteTagsFromFile(@PathVariable("id") Long id,
-                                 @RequestParam("tags") String[] tags) {
-        return ResponseEntity.ok().build();
+    @DeleteMapping(value = "/{id:\\d+}/tags", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> removeTags(@PathVariable("id") Long id,
+                                             @RequestBody String[] tags) {
+        if (fileService.removeTags(id, tags)) {
+            return new ResponseEntity<>("{\"success\": true}", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("{\n" +
+                    "  \"success\": false,\n" +
+                    "  \"error\": \"tag not found on file\"\n" +
+                    "}\n", HttpStatus.BAD_REQUEST);
+        }
     }
 
 //    @GetMapping

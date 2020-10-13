@@ -66,6 +66,15 @@ public class MyFile {
         this.tags.addAll(tags);
     }
 
+    public boolean removeTags(Collection<String> tags) {
+        for (String tag : tags) {
+            if (!this.tags.remove(tag)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

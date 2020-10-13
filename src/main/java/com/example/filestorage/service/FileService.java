@@ -39,6 +39,20 @@ public class FileService {
         return false;
     }
 
+
+    public boolean removeTags(Long id, String[] tags) {
+        if (repository.findById(id).isPresent()) {
+            MyFile current = repository.findById(id).get();
+
+            boolean result = current.removeTags(Arrays.asList(tags));
+
+            repository.save(current);
+
+            return result;
+        }
+        return false;
+    }
+
     public List<MyFile> getAll() {
         List<MyFile> resultList = new ArrayList<>();
         Iterable<MyFile>  list = repository.findAll();
