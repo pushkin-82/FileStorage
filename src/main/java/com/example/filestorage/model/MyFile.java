@@ -2,6 +2,8 @@ package com.example.filestorage.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -18,14 +20,14 @@ public class MyFile {
 
     private Long size;
 
+    @Field(type = FieldType.Nested, includeInParent = true)
     private Set<String> tags = new HashSet<>();
 
     public MyFile() {
     }
 
     public MyFile(String name, Long size) {
-        this.name = name;
-        this.size = size;
+        this(null, name, size);
     }
 
     public MyFile(String id, String name, Long size) {

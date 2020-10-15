@@ -4,11 +4,9 @@ import com.example.filestorage.model.MyFile;
 import com.example.filestorage.repository.FileRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,16 +14,17 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class FileServiceTest {
 
     private final MyFile FILE_1 = new MyFile("128", "qwe.qwe", 12000L);
 
-    private final MyFile FILE_2 = new MyFile("129", "wer.mp3", 123123L);
+    private final MyFile FILE_2 = new MyFile("129dv", "wer.mp3", 123123L);
 
-    private final MyFile FILE_3 = new MyFile("140", "erty.12f", 12L);
+    private final MyFile FILE_3 = new MyFile("qq", "erty.12f", 12L);
 
     private  final MyFile NEW_FILE = new MyFile("name.txt", 121L);
 
@@ -36,7 +35,7 @@ class FileServiceTest {
     private final MyFile NEW_FILE_WRONG_SIZE = new MyFile("qwe.qwe", -1L);
 
     @Autowired
-    ElasticsearchOperations operations;
+    ElasticsearchRestTemplate operations;
 
     @Autowired
     private FileRepository fileRepository;
@@ -44,14 +43,12 @@ class FileServiceTest {
     @Autowired
     private FileService fileService;
 
-
     @BeforeEach
     void setUp() {
+        operations.deleteIndex(MyFile.class);
         operations.indexOps(MyFile.class);
         fileRepository.saveAll(getData());
     }
-
-
 
     @Test
     void shouldDeleteFileIfExists() {
@@ -92,7 +89,65 @@ class FileServiceTest {
         assertThat(result).hasValue("File size should be positive number");
     }
 
+    @Test
+    void shouldAssignTagsToFile() {
+        String[] tags = new String[]{"a", "s", "d"};
+        boolean result = fileService.assignTags("qq", tags);
+
+        assertTrue(result);
+
+        MyFile updated = fileService.getById("qq");
+        assertThat(updated.getTags()).containsExactlyInAnyOrder("a", "s", "d");
+    }
+
+    @Test
+    void shouldAssignTagsToFileWithTags() {
+        String[] tags = new String[]{"a", "s", "d"};
+        boolean result = fileService.assignTags("128", tags);
+
+        assertTrue(result);
+
+        MyFile updated = fileService.getById("128");
+        assertThat(updated.getTags()).containsExactlyInAnyOrder("a", "s", "d", "q", "w", "e");
+    }
+
+    @Test
+    void shouldReturnFalseIfTryToAssignTagsToNotExistingFile() {
+        String[] tags = new String[]{"a", "s", "d"};
+        boolean result = fileService.assignTags("1298", tags);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void shouldRemoveTagsFromExistingFileIfPresent() {
+        String[] tags = new String[]{"w", "e"};
+
+        boolean result = fileService.removeTags("128", tags);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void shouldReturnFalseIfRemoveTagsFromExistingFileIfNotPresent() {
+        String[] tags = new String[]{"w", "cv"};
+
+        boolean result = fileService.removeTags("128", tags);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void shouldReturnFalseIfTryToRemoveTagsFromNotExistingFile() {
+        String[] tags = new String[]{"w", "e"};
+
+        boolean result = fileService.removeTags("128", tags);
+
+        assertTrue(result);
+    }
+
     private List<MyFile> getData() {
+        FILE_1.setTags(Arrays.asList("q", "w", "e"));
         return new ArrayList<>(Arrays.asList(FILE_1, FILE_2, FILE_3));
     }
 }
