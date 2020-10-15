@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.IndexOperations;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +36,7 @@ class FileServiceTest {
     private final MyFile NEW_FILE_WRONG_SIZE = new MyFile("qwe.qwe", -1L);
 
     @Autowired
-    ElasticsearchRestTemplate operations;
+    ElasticsearchRestTemplate elasticsearchRestTemplate;
 
     @Autowired
     private FileRepository fileRepository;
@@ -45,8 +46,9 @@ class FileServiceTest {
 
     @BeforeEach
     void setUp() {
-        operations.deleteIndex(MyFile.class);
-        operations.indexOps(MyFile.class);
+        IndexOperations operations = elasticsearchRestTemplate.indexOps(MyFile.class);
+        operations.delete();
+        operations.create();
         fileRepository.saveAll(getData());
     }
 
