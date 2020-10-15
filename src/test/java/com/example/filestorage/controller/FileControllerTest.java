@@ -2,6 +2,7 @@ package com.example.filestorage.controller;
 
 import com.example.filestorage.model.MyFile;
 import com.example.filestorage.service.FileService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,6 +42,8 @@ class FileControllerTest {
     private final MyFile NEW_FILE_WRONG_NAME = new MyFile("qeqe.w", 1212L);
 
     private final MyFile NEW_FILE_WRONG_SIZE = new MyFile("qwe.qwe", -1L);
+
+    private final static String[] TAGS = new String[]{"q", "w", "e"};
 
     @Autowired
     private MockMvc mockMvc;
@@ -131,5 +134,59 @@ class FileControllerTest {
                         "}\n"));
     }
 
+    @Test
+    void shouldAssignTagsAndReturnHttpStatusOkIfExistsById() throws Exception {
+        when(fileService.assignTags(FILE_1_ID, TAGS)).thenReturn(true);
 
+        String jsonBody = objectMapper.writeValueAsString(TAGS);
+
+        mockMvc.perform(post(BASE_URL + "/{id}/tags", FILE_1_ID)
+                .contentType(APPLICATION_JSON)
+                .content(jsonBody))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"success\": true}"));
+    }
+
+    @Test
+    void shouldAssignTagsAndReturnHttpStatusNotFoundIfExistsById() throws Exception {
+        when(fileService.assignTags(FILE_1_ID, TAGS)).thenReturn(false);
+
+        String jsonBody = objectMapper.writeValueAsString(TAGS);
+
+        mockMvc.perform(post(BASE_URL + "/{id}/tags", FILE_1_ID)
+                .contentType(APPLICATION_JSON)
+                .content(jsonBody))
+                .andExpect(status().isNotFound())
+                .andExpect(content().json("{\n \"success\": false,\n" +
+                        "  \"error\": \"file not found\"\n}\n"));
+    }
+
+    @Test
+    void shouldRemoveTagsAndReturnHttpStatusOkIfExistsById() throws Exception {
+        when(fileService.removeTags(FILE_1_ID, TAGS)).thenReturn(true);
+
+        String jsonBody = objectMapper.writeValueAsString(TAGS);
+
+        mockMvc.perform(delete(BASE_URL + "/{id}/tags", FILE_1_ID)
+                .contentType(APPLICATION_JSON)
+                .content(jsonBody))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"success\": true}"));
+    }
+
+    @Test
+    void shouldRemoveTagsAndReturnHttpStatusNotFoundIfExistsById() throws Exception {
+        when(fileService.removeTags(FILE_1_ID, TAGS)).thenReturn(false);
+
+        String jsonBody = objectMapper.writeValueAsString(TAGS);
+
+        mockMvc.perform(delete(BASE_URL + "/{id}/tags", FILE_1_ID)
+                .contentType(APPLICATION_JSON)
+                .content(jsonBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json("{\n" +
+                        "  \"success\": false,\n" +
+                        "  \"error\": \"tag not found on file\"\n" +
+                        "}\n"));
+    }
 }
