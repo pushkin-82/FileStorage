@@ -14,7 +14,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -53,7 +55,7 @@ class FileControllerTest {
     private FileController fileController;
 
     @Test
-    void shouldDeleteFileAndReturnHttpStatusOk() throws Exception {
+    void shouldDeleteFileByIdAndReturnHttpStatusOk() throws Exception {
         when(fileService.deleteById("128")).thenReturn(true);
 
         mockMvc.perform(delete(BASE_URL + "/{id}", FILE_1_ID))
@@ -68,4 +70,66 @@ class FileControllerTest {
                 .andExpect(content().json("{\n \"success\": false,\n" +
                         "  \"error\": \"file not found\"\n}\n"));
     }
+
+    @Test
+    void shouldUploadFileAndReturnHttpStatusOk() throws Exception {
+        when(fileService.uploadFile(NEW_FILE)).thenReturn(Optional.empty());
+        String jsonBody = objectMapper.writeValueAsString(NEW_FILE);
+
+        mockMvc.perform(post(BASE_URL)
+                .contentType(APPLICATION_JSON)
+                .content(jsonBody))
+                .andExpect(status().isOk())
+                .andExpect(content().json("\"ID\": \"" + NEW_FILE.getId() + "\""));
+    }
+
+    @Test
+    void shouldReturnHttpStatusBadRequestWhenUploadFileWithEmptyName() throws Exception {
+        String jsonBody = objectMapper.writeValueAsString(NEW_FILE_BLANK_NAME);
+
+        when(fileService.uploadFile(NEW_FILE_BLANK_NAME)).thenReturn(Optional.of("Name should not be empty"));
+
+        mockMvc.perform(post(BASE_URL)
+                .contentType(APPLICATION_JSON)
+                .content(jsonBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json("{\n" +
+                        "  \"success\": false,\n" +
+                        "  \"error\": \"Name should not be empty\"\n" +
+                        "}\n"));
+    }
+
+    @Test
+    void shouldReturnHttpStatusBadRequestWhenUploadFileWithWrongName() throws Exception {
+        String jsonBody = objectMapper.writeValueAsString(NEW_FILE_WRONG_NAME);
+
+        when(fileService.uploadFile(NEW_FILE_WRONG_NAME)).thenReturn(Optional.of("File should have proper extension"));
+
+        mockMvc.perform(post(BASE_URL)
+                .contentType(APPLICATION_JSON)
+                .content(jsonBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json("{\n" +
+                        "  \"success\": false,\n" +
+                        "  \"error\": \"File should have proper extension\"\n" +
+                        "}\n"));
+    }
+
+    @Test
+    void shouldReturnHttpStatusBadRequestWhenUploadFileWithWrongSize() throws Exception {
+        String jsonBody = objectMapper.writeValueAsString(NEW_FILE_WRONG_SIZE);
+
+        when(fileService.uploadFile(NEW_FILE_WRONG_SIZE)).thenReturn(Optional.of("File size should be positive number"));
+
+        mockMvc.perform(post(BASE_URL)
+                .contentType(APPLICATION_JSON)
+                .content(jsonBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json("{\n" +
+                        "  \"success\": false,\n" +
+                        "  \"error\": \"File size should be positive number\"\n" +
+                        "}\n"));
+    }
+
+
 }
