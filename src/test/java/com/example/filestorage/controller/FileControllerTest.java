@@ -231,9 +231,37 @@ class FileControllerTest {
         FILE_6.setTags(Arrays.asList("q", "w", "e", "r"));
         Page<MyFile> files = new PageImpl<>(Arrays.asList(FILE_6));
 
-        when(fileService.getAllWithFilter(tags, pageable)).thenReturn(files);
+        when(fileService.getAllByTags(tags, pageable)).thenReturn(files);
 
         mockMvc.perform(get(BASE_URL + "?tags=w,e&page=1&size=2"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturnMyFileListByNameContainingTemplateDueToFilterAndPaginatingByDefault() throws Exception {
+        Pageable pageable = PageRequest.of(0, 10);
+        String q = "qw";
+        Page<MyFile> files = new PageImpl<>(Arrays.asList(FILE_1, FILE_2, FILE_3, FILE_4, FILE_5, FILE_6));
+        when(fileService.getAllByNameContaining(q, pageable)).thenReturn(files);
+
+        mockMvc.perform(get(BASE_URL + "?q=qw"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturnMyFileListByNameContainingTemplateDueToFilterAndPaginating() throws Exception {
+        Pageable pageable = PageRequest.of(1, 2);
+        String q = "qw";
+        String[] tags = new String[]{"w", "e"};
+        FILE_1.setTags(Arrays.asList("q", "w", "e"));
+        FILE_4.setTags(Arrays.asList("q", "w"));
+        FILE_5.setTags(Arrays.asList("r", "w", "e"));
+        FILE_6.setTags(Arrays.asList("q", "w", "e", "r"));
+        Page<MyFile> files = new PageImpl<>(Arrays.asList(FILE_6));
+
+        when(fileService.getAllByTagsAndNameContaining(tags, q, pageable)).thenReturn(files);
+
+        mockMvc.perform(get(BASE_URL + "?tags=w,e&page=1&size=2&q=qw"))
                 .andExpect(status().isOk());
     }
 }

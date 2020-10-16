@@ -23,11 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 class FileServiceTest {
 
-    private final MyFile FILE_1 = new MyFile("128", "qwe.qwe", 12000L);
+    private final MyFile FILE_1 = new MyFile("128", "Qwe.qWe", 12000L);
 
     private final MyFile FILE_2 = new MyFile("129dv", "wer.mp3", 123123L);
 
-    private final MyFile FILE_3 = new MyFile("qq", "erty.12f", 12L);
+    private final MyFile FILE_3 = new MyFile("qq", "eqwy.12f", 12L);
 
     private final MyFile FILE_4 = new MyFile("q", "qwe.qwe", 12000L);
 
@@ -197,15 +197,36 @@ class FileServiceTest {
         Pageable pageable = PageRequest.of(0, 2);
         String[] tags = new String[]{"w", "e"};
 
-        List<MyFile> resultList = fileService.getAllWithFilter(tags, pageable).getContent();
+        List<MyFile> resultList = fileService.getAllByTags(tags, pageable).getContent();
 
         assertThat(resultList).containsExactlyInAnyOrder(FILE_1, FILE_5);
 
         String[] tags1 = new String[]{"r"};
 
-        List<MyFile> resultList1 = fileService.getAllWithFilter(tags1, pageable).getContent();
+        List<MyFile> resultList1 = fileService.getAllByTags(tags1, pageable).getContent();
 
         assertThat(resultList1).containsExactlyInAnyOrder(FILE_5, FILE_6);
+    }
+
+    @Test
+    void shouldReturnFileListByNameContainingTemplateWithPaginating() {
+        Pageable pageable = PageRequest.of(0, 10);
+        String template = "qw";
+
+        List<MyFile> resultList = fileService.getAllByNameContaining(template, pageable).getContent();
+
+        assertThat(resultList).containsExactlyInAnyOrder(FILE_1, FILE_4, FILE_3);
+    }
+
+    @Test
+    void shouldReturnFileListByTagsAndNameContainingTemplateWithPaginating() {
+        Pageable pageable = PageRequest.of(0, 10);
+        String[] tags = new String[]{"w", "e"};
+        String template = "qw";
+
+        List<MyFile> resultList = fileService.getAllByTagsAndNameContaining(tags, template, pageable).getContent();
+
+        assertThat(resultList).containsExactlyInAnyOrder(FILE_1);
     }
 
     private List<MyFile> getData() {

@@ -75,9 +75,18 @@ public class FileService {
         return repository.findAll(pageable);
     }
 
-    public Page<MyFile> getAllWithFilter(String[] tags, Pageable pageable) {
+    public Page<MyFile> getAllByTags(String[] tags, Pageable pageable) {
        return repository.findAllByTags(Arrays.asList(tags), pageable);
     }
+
+    public Page<MyFile> getAllByNameContaining(String template, Pageable pageable) {
+        return repository.findAllByNameContaining(template, pageable);
+    }
+
+    public Page<MyFile> getAllByTagsAndNameContaining(String[] tags, String template, Pageable pageable) {
+        return repository.findAllByTagsAndNameContaining(Arrays.asList(tags), template, pageable);
+    }
+
 
     public MyFile getById(String id) {
         return repository.findById(id).get();

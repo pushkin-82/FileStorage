@@ -101,14 +101,23 @@ public class FileController {
     @GetMapping(produces = "application/json")
     public ResponseEntity<Object> getFilesWithFilter(@RequestParam(required = false) String[] tags,
                                                      @RequestParam(defaultValue = "0") int page,
-                                                     @RequestParam(defaultValue = "10") int size) {
+                                                     @RequestParam(defaultValue = "10") int size,
+                                                     @RequestParam(required = false) String q) {
         Pageable pageable = PageRequest.of(page, size);
         Page<MyFile> resultPage;
 
         if (tags == null) {
-            resultPage = fileService.getAll(pageable);
+            if (q == null) {
+                resultPage = fileService.getAll(pageable);
+            } else {
+                resultPage = fileService.getAllByNameContaining(q, pageable);
+            }
         } else {
-            resultPage = fileService.getAllWithFilter(tags, pageable);
+            if (q == null) {
+                resultPage = fileService.getAllByTags(tags, pageable);
+            } else {
+                resultPage = fileService.getAllByTagsAndNameContaining(tags, q, pageable);
+            }
         }
 
         List<MyFile> resultList = resultPage.getContent();

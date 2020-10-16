@@ -12,4 +12,8 @@ import java.util.Collection;
 public interface FileRepository extends ElasticsearchRepository<MyFile, String> {
 
     Page<MyFile> findAllByTags(Collection<String> tags, Pageable pageable);
+
+    Page<MyFile> findAllByNameContaining(String template, Pageable pageable);
+
+    Page<MyFile> findAllByTagsAndNameContaining(Collection<String> tags, String template, Pageable pageable);
 }
