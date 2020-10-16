@@ -117,7 +117,7 @@ class FileServiceTest {
     void shouldNotUploadNewFIleIfSizeIsNegative() {
         Optional<String> result = fileService.uploadFile(NEW_FILE_WRONG_SIZE);
 
-        assertThat(result).hasValue("File size should be positive number");
+        assertThat(result).hasValue("File size shouldn't be a negative number");
     }
 
     @Test
