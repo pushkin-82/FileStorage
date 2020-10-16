@@ -35,22 +35,18 @@ public class FileController {
     @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> uploadFile(@RequestBody MyFile myFile) {
         if (fileService.uploadFile(myFile).isEmpty()) {
-            return new ResponseEntity<>("\"ID\": \"" + myFile.getId() + "\"" , HttpStatus.OK);
+            return new ResponseEntity<>(new UploadResponse(myFile.getId()), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("{\n" +
-                    "  \"success\": false,\n" +
-                    "  \"error\": \"" + fileService.uploadFile(myFile).get() + "\"\n" +
-                    "}\n", HttpStatus.BAD_REQUEST );
+            return new ResponseEntity<>(new ErrorResponse(false, fileService.uploadFile(myFile).get()), HttpStatus.BAD_REQUEST );
         }
     }
 
     @DeleteMapping(value = "/{id}", produces = "application/json")
     public ResponseEntity<Object> deleteFile(@PathVariable("id") String id) {
         if (fileService.deleteById(id)) {
-            return new ResponseEntity("{\"success\": true}", HttpStatus.OK);
+            return new ResponseEntity<>(new ErrorResponse(true), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("{\n \"success\": false,\n" +
-                    "  \"error\": \"file not found\"\n}\n", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ErrorResponse(false, "file not found"), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -58,10 +54,9 @@ public class FileController {
     public ResponseEntity<Object> assignTags(@PathVariable("id") String id,
                                              @RequestBody String[] tags) {
         if (fileService.assignTags(id, tags)) {
-            return new ResponseEntity<>("{\"success\": true}", HttpStatus.OK);
+            return new ResponseEntity<>(new ErrorResponse(true), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("{\n \"success\": false,\n" +
-                    "  \"error\": \"file not found\"\n}\n", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ErrorResponse(false, "file not found"), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -69,12 +64,9 @@ public class FileController {
     public ResponseEntity<Object> removeTags(@PathVariable("id") String id,
                                              @RequestBody String[] tags) {
         if (fileService.removeTags(id, tags)) {
-            return new ResponseEntity<>("{\"success\": true}", HttpStatus.OK);
+            return new ResponseEntity<>(new ErrorResponse(true), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("{\n" +
-                    "  \"success\": false,\n" +
-                    "  \"error\": \"tag not found on file\"\n" +
-                    "}\n", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ErrorResponse(false, "tag not found on file"), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -103,5 +95,51 @@ public class FileController {
         return new ResponseEntity<>("{\n" +
                 "   \"total\": " + total + ",\n" +
                 "   \"page\": " + myFilePage.getContent() + "\n}\n", HttpStatus.OK);
+    }
+
+    private static class ErrorResponse {
+        private Boolean success;
+        private String error;
+
+        public ErrorResponse(Boolean success, String error) {
+            this.success = success;
+            this.error = error;
+        }
+
+        public ErrorResponse(Boolean success) {
+            this(success, null);
+        }
+
+        public Boolean getSuccess() {
+            return success;
+        }
+
+        public void setSuccess(Boolean success) {
+            this.success = success;
+        }
+
+        public String getError() {
+            return error;
+        }
+
+        public void setError(String error) {
+            this.error = error;
+        }
+    }
+
+    private static class UploadResponse {
+        private String id;
+
+        public UploadResponse(String id) {
+            this.id = id;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
     }
 }

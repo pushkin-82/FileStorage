@@ -27,12 +27,10 @@ public class FileService {
             error = "file cannot be null";
         } else if (myFile.getName() == null || myFile.getName().isBlank()) {
             error = "Name should not be empty";
-//        } else if (!myFile.getName().matches("[a-z1-9]+\\.[a-z1-9]{3,4}")) {
-//            error = "File should have proper extension";
         } else if (myFile.getSize() == null) {
             error = "File size should not be null";
         } else if (myFile.getSize() < 0) {
-            error = "File size should be positive number";
+            error = "File size shouldn't be a negative number";
         } else {
             error = "";
         }
