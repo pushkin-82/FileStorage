@@ -61,7 +61,6 @@ class FileControllerTest {
         String responseJson = "{\"success\": true}";
         when(fileService.deleteById("128")).thenReturn(true);
 
-
         mockMvc.perform(delete(BASE_URL + "/{id}", FILE_1_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().json(responseJson));

@@ -2,6 +2,7 @@ package com.example.filestorage.controller;
 
 import com.example.filestorage.model.MyFile;
 import com.example.filestorage.service.FileService;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -99,6 +100,8 @@ public class FileController {
 
     private static class ErrorResponse {
         private Boolean success;
+
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         private String error;
 
         public ErrorResponse(Boolean success, String error) {
