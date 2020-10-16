@@ -27,6 +27,12 @@ class FileServiceTest {
 
     private final MyFile FILE_3 = new MyFile("qq", "erty.12f", 12L);
 
+    private final MyFile FILE_4 = new MyFile("q", "qwe.qwe", 12000L);
+
+    private final MyFile FILE_5 = new MyFile("a", "wer.mp3", 123123L);
+
+    private final MyFile FILE_6 = new MyFile("z", "erty.12f", 12L);
+
     private  final MyFile NEW_FILE = new MyFile("name.txt", 121L);
 
     private final MyFile NEW_FILE_BLANK_NAME = new MyFile("   ", 127L);
@@ -184,8 +190,26 @@ class FileServiceTest {
         assertTrue(result);
     }
 
+    @Test
+    void shouldReturnFileListWithPaginatingConditionalsAndFilters() {
+        String[] tags = new String[]{"w", "e"};
+
+        List<MyFile> resultList = fileService.getAllWithFilter(tags);
+
+        assertThat(resultList).containsExactlyInAnyOrder(FILE_1, FILE_5, FILE_6);
+
+        String[] tags1 = new String[]{"r"};
+
+        List<MyFile> resultList1 = fileService.getAllWithFilter(tags1);
+
+        assertThat(resultList1).containsExactlyInAnyOrder(FILE_5, FILE_6);
+    }
+
     private List<MyFile> getData() {
         FILE_1.setTags(Arrays.asList("q", "w", "e"));
-        return new ArrayList<>(Arrays.asList(FILE_1, FILE_2, FILE_3));
+        FILE_4.setTags(Arrays.asList("q", "w"));
+        FILE_5.setTags(Arrays.asList("r", "w", "e"));
+        FILE_6.setTags(Arrays.asList("q", "w", "e", "r"));
+        return new ArrayList<>(Arrays.asList(FILE_1, FILE_2, FILE_3, FILE_4, FILE_5, FILE_6));
     }
 }

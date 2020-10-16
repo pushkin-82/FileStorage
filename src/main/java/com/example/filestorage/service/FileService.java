@@ -4,10 +4,7 @@ import com.example.filestorage.model.MyFile;
 import com.example.filestorage.repository.FileRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -82,11 +79,7 @@ public class FileService {
     }
 
     public List<MyFile> getAllWithFilter(String[] tags) {
-        Iterable<MyFile>  list = repository.findAll();
-
-        List<MyFile> resultList = new ArrayList<>();
-
-        list.forEach(resultList::add);
+        List<MyFile> resultList = repository.findAllByTags(new HashSet<>(Arrays.asList(tags)));
 
         return resultList
                 .stream()
