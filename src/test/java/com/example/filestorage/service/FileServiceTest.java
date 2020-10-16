@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.IndexOperations;
 
@@ -192,15 +194,16 @@ class FileServiceTest {
 
     @Test
     void shouldReturnFileListWithPaginatingConditionalsAndFilters() {
+        Pageable pageable = PageRequest.of(0, 2);
         String[] tags = new String[]{"w", "e"};
 
-        List<MyFile> resultList = fileService.getAllWithFilter(tags);
+        List<MyFile> resultList = fileService.getAllWithFilter(tags, pageable);
 
-        assertThat(resultList).containsExactlyInAnyOrder(FILE_1, FILE_5, FILE_6);
+        assertThat(resultList).containsExactlyInAnyOrder(FILE_1, FILE_5);
 
         String[] tags1 = new String[]{"r"};
 
-        List<MyFile> resultList1 = fileService.getAllWithFilter(tags1);
+        List<MyFile> resultList1 = fileService.getAllWithFilter(tags1, pageable);
 
         assertThat(resultList1).containsExactlyInAnyOrder(FILE_5, FILE_6);
     }

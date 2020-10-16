@@ -78,24 +78,16 @@ public class FileController {
         String[] filterTags = tags.orElse(new String[0]);
         int currentPage = page.orElse(DEFAULT_PAGE);
         int pageSize = size.orElse(DEFAULT_PAGE_SIZE);
+        Pageable pageable = PageRequest.of(currentPage, pageSize);
 
         List<MyFile> resultList;
         if (filterTags.length == 0) {
-            resultList = fileService.getAll();
+            resultList = fileService.getAll(pageable);
         } else {
-            resultList = fileService.getAllWithFilter(filterTags);
+            resultList = fileService.getAllWithFilter(filterTags, pageable);
         }
 
-        int total = resultList.size();
-        Pageable pageable = PageRequest.of(currentPage, pageSize);
-
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), total);
-        Page<MyFile> myFilePage = new PageImpl<>(resultList.subList(start, end), pageable, total);
-
-        return new ResponseEntity<>("{\n" +
-                "   \"total\": " + total + ",\n" +
-                "   \"page\": " + myFilePage.getContent() + "\n}\n", HttpStatus.OK);
+        return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
 
     private static class ErrorResponse {
