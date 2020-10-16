@@ -2,25 +2,24 @@ package com.example.filestorage.controller;
 
 import com.example.filestorage.model.MyFile;
 import com.example.filestorage.service.FileService;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/file")
 public class FileController {
 
-    private static final int DEFAULT_PAGE = 0;
+    private static final String SUCCESS = "success";
 
-    private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final String ERROR = "error";
 
     private final FileService fileService;
 
@@ -35,106 +34,90 @@ public class FileController {
 
     @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> uploadFile(@RequestBody MyFile myFile) {
+        Map<String, Object> response = new HashMap<>();
+
         if (fileService.uploadFile(myFile).isEmpty()) {
-            return new ResponseEntity<>(new UploadResponse(myFile.getId()), HttpStatus.OK);
+            response.put("id", myFile.getId());
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(new ErrorResponse(false, fileService.uploadFile(myFile).get()), HttpStatus.BAD_REQUEST );
+            response.put(SUCCESS, false);
+            response.put(ERROR, fileService.uploadFile(myFile).get());
+
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST );
         }
     }
 
     @DeleteMapping(value = "/{id}", produces = "application/json")
     public ResponseEntity<Object> deleteFile(@PathVariable("id") String id) {
+        Map<String, Object> response = new HashMap<>();
+
         if (fileService.deleteById(id)) {
-            return new ResponseEntity<>(new ErrorResponse(true), HttpStatus.OK);
+            response.put(SUCCESS, true);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(new ErrorResponse(false, "file not found"), HttpStatus.NOT_FOUND);
+            response.put(SUCCESS, false);
+            response.put(ERROR, "file not found");
+
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
     }
 
     @PostMapping(value = "/{id}/tags", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> assignTags(@PathVariable("id") String id,
                                              @RequestBody String[] tags) {
+        Map<String, Object> response = new HashMap<>();
+
         if (fileService.assignTags(id, tags)) {
-            return new ResponseEntity<>(new ErrorResponse(true), HttpStatus.OK);
+            response.put(SUCCESS, true);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(new ErrorResponse(false, "file not found"), HttpStatus.NOT_FOUND);
+            response.put(SUCCESS, false);
+            response.put(ERROR, "file not found");
+
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
     }
 
     @DeleteMapping(value = "/{id}/tags", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> removeTags(@PathVariable("id") String id,
                                              @RequestBody String[] tags) {
+        Map<String, Object> response = new HashMap<>();
+
         if (fileService.removeTags(id, tags)) {
-            return new ResponseEntity<>(new ErrorResponse(true), HttpStatus.OK);
+            response.put(SUCCESS, true);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(new ErrorResponse(false, "tag not found on file"), HttpStatus.BAD_REQUEST);
+            response.put(SUCCESS, false);
+            response.put(ERROR, "tag not found on file");
+
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping(produces = "application/json")
-    public ResponseEntity<Object> getFilesWithFilter(@RequestParam("tags") Optional<String[]> tags,
-                                                     @RequestParam("page") Optional<Integer> page,
-                                                     @RequestParam("size") Optional<Integer> size) {
-        String[] filterTags = tags.orElse(new String[0]);
-        int currentPage = page.orElse(DEFAULT_PAGE);
-        int pageSize = size.orElse(DEFAULT_PAGE_SIZE);
-        Pageable pageable = PageRequest.of(currentPage, pageSize);
+    public ResponseEntity<Object> getFilesWithFilter(@RequestParam(required = false) String[] tags,
+                                                     @RequestParam(defaultValue = "0") int page,
+                                                     @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<MyFile> resultPage;
 
-        List<MyFile> resultList;
-        if (filterTags.length == 0) {
-            resultList = fileService.getAll(pageable);
+        if (tags == null) {
+            resultPage = fileService.getAll(pageable);
         } else {
-            resultList = fileService.getAllWithFilter(filterTags, pageable);
+            resultPage = fileService.getAllWithFilter(tags, pageable);
         }
 
-        return new ResponseEntity<>(resultList, HttpStatus.OK);
-    }
+        List<MyFile> resultList = resultPage.getContent();
 
-    private static class ErrorResponse {
-        private Boolean success;
+        Map<String, Object> response = new HashMap<>();
 
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        private String error;
+        response.put("total", resultPage.getTotalElements());
+        response.put("page", resultList);
 
-        public ErrorResponse(Boolean success, String error) {
-            this.success = success;
-            this.error = error;
-        }
-
-        public ErrorResponse(Boolean success) {
-            this(success, null);
-        }
-
-        public Boolean getSuccess() {
-            return success;
-        }
-
-        public void setSuccess(Boolean success) {
-            this.success = success;
-        }
-
-        public String getError() {
-            return error;
-        }
-
-        public void setError(String error) {
-            this.error = error;
-        }
-    }
-
-    private static class UploadResponse {
-        private String id;
-
-        public UploadResponse(String id) {
-            this.id = id;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

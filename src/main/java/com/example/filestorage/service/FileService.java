@@ -2,6 +2,7 @@ package com.example.filestorage.service;
 
 import com.example.filestorage.model.MyFile;
 import com.example.filestorage.repository.FileRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -71,20 +72,14 @@ public class FileService {
         return false;
     }
 
-    public List<MyFile> getAll(Pageable pageable) {
-        List<MyFile> resultList = new ArrayList<>();
-        Iterable<MyFile>  list = repository.findAll(pageable);
-        list.forEach(resultList::add);
-
-        return resultList;
+    public Page<MyFile> getAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
-    public List<MyFile> getAllWithFilter(String[] tags, Pageable pageable) {
-        List<MyFile> resultList = repository.findAllByTags(new HashSet<>(Arrays.asList(tags)), pageable);
+    public Page<MyFile> getAllWithFilter(String[] tags, Pageable pageable) {
+       Page<MyFile> resultList = repository.findAllByTags(new HashSet<>(Arrays.asList(tags)), pageable);
 
-        return resultList
-                .stream()
-                .filter(file -> file.getTags().containsAll(Arrays.asList(tags))).collect(Collectors.toList());
+        return resultList;
     }
 
     public MyFile getById(String id) {
