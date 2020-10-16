@@ -35,6 +35,16 @@ class FileServiceTest {
 
     private final MyFile FILE_6 = new MyFile("z", "erty.12f", 12L);
 
+    private final MyFile AUDIO_FILE = new MyFile("a", "dfwdc.mp3", 148L);
+
+    private final MyFile VIDEO_FILE = new MyFile("v", "dfwdc.mp4", 148L);
+
+    private final MyFile DOC_FILE = new MyFile("d", "dfwdc.doc", 148L);
+
+    private final MyFile IMAGE_FILE = new MyFile("img", "dfwdc.jpeg", 148L);
+
+    private final MyFile PLAIN_FILE = new MyFile("plain", "dfwdc.x", 148L);
+
     private  final MyFile NEW_FILE = new MyFile("name.txt", 121L);
 
     private final MyFile NEW_FILE_BLANK_NAME = new MyFile("   ", 127L);
@@ -227,6 +237,51 @@ class FileServiceTest {
         List<MyFile> resultList = fileService.getAllByTagsAndNameContaining(tags, template, pageable).getContent();
 
         assertThat(resultList).containsExactlyInAnyOrder(FILE_1);
+    }
+
+    @Test
+    void shouldAddAudioTagWhenUploadWithProperExtension() {
+        fileService.uploadFile(AUDIO_FILE);
+
+        MyFile expected = fileService.getById("a");
+
+        assertThat(expected.getTags()).containsExactlyInAnyOrder("audio");
+    }
+
+    @Test
+    void shouldAddVideoTagWhenUploadWithProperExtension() {
+        fileService.uploadFile(VIDEO_FILE);
+
+        MyFile expected = fileService.getById("v");
+
+        assertThat(expected.getTags()).containsExactlyInAnyOrder("video");
+    }
+
+    @Test
+    void shouldAddDocumentTagWhenUploadWithProperExtension() {
+        fileService.uploadFile(DOC_FILE);
+
+        MyFile expected = fileService.getById("d");
+
+        assertThat(expected.getTags()).containsExactlyInAnyOrder("document");
+    }
+
+    @Test
+    void shouldAddImageTagWhenUploadWithProperExtension() {
+        fileService.uploadFile(IMAGE_FILE);
+
+        MyFile expected = fileService.getById("img");
+
+        assertThat(expected.getTags()).containsExactlyInAnyOrder("image");
+    }
+
+    @Test
+    void shouldNotAddTagsWhenUploadWithNotProperExtension() {
+        fileService.uploadFile(PLAIN_FILE);
+
+        MyFile expected = fileService.getById("plain");
+
+        assertThat(expected.getTags()).isEmpty();
     }
 
     private List<MyFile> getData() {

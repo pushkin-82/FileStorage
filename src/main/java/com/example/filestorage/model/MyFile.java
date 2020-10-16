@@ -36,6 +36,13 @@ public class MyFile {
         this.size = size;
     }
 
+    public MyFile(String id, String name, Long size, Collection<String> tags) {
+        this.id = id;
+        this.name = name;
+        this.size = size;
+        setTags(tags);
+    }
+
     public String getId() {
         return id;
     }

@@ -1,5 +1,9 @@
 package com.example.filestorage.service;
 
+import com.example.filestorage.extensions.AudioExtension;
+import com.example.filestorage.extensions.DocumentExtension;
+import com.example.filestorage.extensions.ImageExtension;
+import com.example.filestorage.extensions.VideoExtension;
 import com.example.filestorage.model.MyFile;
 import com.example.filestorage.repository.FileRepository;
 import org.springframework.data.domain.Page;
@@ -37,6 +41,7 @@ public class FileService {
             return Optional.of(error);
         }
 
+        addDefaultTagsToFile(myFile);
         repository.save(myFile);
 
         return Optional.empty();
@@ -87,7 +92,6 @@ public class FileService {
         return repository.findAllByTagsAndNameContaining(Arrays.asList(tags), template, pageable);
     }
 
-
     public MyFile getById(String id) {
         return repository.findById(id).get();
     }
@@ -100,4 +104,23 @@ public class FileService {
             return false;
         }
     }
+
+    private void addDefaultTagsToFile(MyFile myFile) {
+        String extension = "";
+        String fileName = myFile.getName();
+        if (fileName.indexOf('.') >= 0) {
+            int index = fileName.lastIndexOf('.');
+            extension = fileName.substring(index + 1);
+        }
+        if (AudioExtension.isInValues(extension)) {
+            myFile.addTag("audio");
+        } else if (VideoExtension.isInValues(extension)) {
+            myFile.addTag("video");
+        } else if (DocumentExtension.isInValues(extension)) {
+            myFile.addTag("document");
+        } else if (ImageExtension.isInValues(extension)) {
+            myFile.addTag("image");
+        }
+    }
+
 }
