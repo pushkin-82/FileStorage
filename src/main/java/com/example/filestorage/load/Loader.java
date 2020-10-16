@@ -8,8 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class Loader {
@@ -24,14 +22,6 @@ public class Loader {
     @Transactional
     public void loadAll() {
         operations.indexOps(MyFile.class);
-        fileRepository.saveAll(getData());
     }
 
-    private List<MyFile> getData() {
-        List<MyFile> myFiles = new ArrayList<>();
-        myFiles.add(new MyFile("123", "qwe", 12000L));
-        myFiles.add(new MyFile("124", "wer", 123123L));
-        myFiles.add(new MyFile("125", "erty", 12L));
-        return myFiles;
-    }
 }

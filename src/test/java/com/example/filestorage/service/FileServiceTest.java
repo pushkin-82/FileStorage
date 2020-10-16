@@ -31,9 +31,17 @@ class FileServiceTest {
 
     private final MyFile NEW_FILE_BLANK_NAME = new MyFile("   ", 127L);
 
-    private final MyFile NEW_FILE_WRONG_NAME = new MyFile("qeqe.w", 1212L);
-
     private final MyFile NEW_FILE_WRONG_SIZE = new MyFile("qwe.qwe", -1L);
+
+    private final MyFile UPLOAD_FILE_1 = new MyFile("ZZZZ.txt", 123L);
+
+    private final MyFile UPLOAD_FILE_2 = new MyFile("тЕсТ.txt", 123L);
+
+    private final MyFile UPLOAD_FILE_3 = new MyFile("test", 123L);
+
+    private final MyFile UPLOAD_FILE_4 = new MyFile("test.txt", 0L);
+
+    private final MyFile UPLOAD_FILE_5 = new MyFile("aaa.txt", null);
 
     @Autowired
     ElasticsearchRestTemplate elasticsearchRestTemplate;
@@ -71,6 +79,34 @@ class FileServiceTest {
     }
 
     @Test
+    void shouldUploadNewFIleCase1() {
+        Optional<String> result = fileService.uploadFile(UPLOAD_FILE_1);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldUploadNewFIleCase2() {
+        Optional<String> result = fileService.uploadFile(UPLOAD_FILE_2);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldUploadNewFIleCase3() {
+        Optional<String> result = fileService.uploadFile(UPLOAD_FILE_3);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldUploadNewFIleCase4() {
+        Optional<String> result = fileService.uploadFile(UPLOAD_FILE_4);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
     void shouldNotUploadNewFIleIfNameIsBlank() {
         Optional<String> result = fileService.uploadFile(NEW_FILE_BLANK_NAME);
 
@@ -78,17 +114,17 @@ class FileServiceTest {
     }
 
     @Test
-    void shouldNotUploadNewFIleIfNameDoesNotHaveProperExtension() {
-        Optional<String> result = fileService.uploadFile(NEW_FILE_WRONG_NAME);
-
-        assertThat(result).hasValue("File should have proper extension");
-    }
-
-    @Test
-    void shouldNotUploadNewFIleIfSizeIsNotPositive() {
+    void shouldNotUploadNewFIleIfSizeIsNegative() {
         Optional<String> result = fileService.uploadFile(NEW_FILE_WRONG_SIZE);
 
         assertThat(result).hasValue("File size should be positive number");
+    }
+
+    @Test
+    void shouldNotUploadNewFIleIfSizeIsNull() {
+        Optional<String> result = fileService.uploadFile(UPLOAD_FILE_5);
+
+        assertThat(result).hasValue("File size should not be null");
     }
 
     @Test
