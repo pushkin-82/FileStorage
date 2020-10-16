@@ -8,15 +8,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,7 +40,11 @@ class FileControllerTest {
 
     private final MyFile FILE_3 = new MyFile("qq", "erty.12f", 12L);
 
-    private  final MyFile NEW_FILE = new MyFile("name.txt", 121L);
+    private final MyFile FILE_4 = new MyFile("q", "qwe.qwe", 12000L);
+
+    private final MyFile FILE_5 = new MyFile("a", "wer.mp3", 123123L);
+
+    private final MyFile FILE_6 = new MyFile("z", "erty.12f", 12L);
 
     private final MyFile NEW_FILE_BLANK_NAME = new MyFile("   ", 127L);
 
@@ -199,5 +209,31 @@ class FileControllerTest {
                 .content(jsonBody))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(responseJson));
+    }
+
+    @Test
+    void shouldReturnMyFileListDueToFilterAndPaginatingByDefault() throws Exception {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<MyFile> files = new PageImpl<>(Arrays.asList(FILE_1, FILE_2, FILE_3, FILE_4, FILE_5, FILE_6));
+        when(fileService.getAll(pageable)).thenReturn(files);
+
+        mockMvc.perform(get(BASE_URL))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturnMyFileListDueToFilterAndPaginating() throws Exception {
+        Pageable pageable = PageRequest.of(1, 2);
+        String[] tags = new String[]{"w", "e"};
+        FILE_1.setTags(Arrays.asList("q", "w", "e"));
+        FILE_4.setTags(Arrays.asList("q", "w"));
+        FILE_5.setTags(Arrays.asList("r", "w", "e"));
+        FILE_6.setTags(Arrays.asList("q", "w", "e", "r"));
+        Page<MyFile> files = new PageImpl<>(Arrays.asList(FILE_6));
+
+        when(fileService.getAllWithFilter(tags, pageable)).thenReturn(files);
+
+        mockMvc.perform(get(BASE_URL + "?tags=w,e&page=1&size=2"))
+                .andExpect(status().isOk());
     }
 }

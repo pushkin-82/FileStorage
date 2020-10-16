@@ -6,11 +6,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
 
 @Repository
 public interface FileRepository extends ElasticsearchRepository<MyFile, String> {
 
-    Page<MyFile> findAllByTags(Set<String> tags, Pageable pageable);
+    Page<MyFile> findAllByTags(Collection<String> tags, Pageable pageable);
 }

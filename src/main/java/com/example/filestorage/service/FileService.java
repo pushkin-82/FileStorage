@@ -6,8 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.Optional;
 
 @Service
 public class FileService {
@@ -51,7 +51,6 @@ public class FileService {
                     currentFile.addTag(tag);
                 }
             }
-
             repository.save(currentFile);
 
             return true;
@@ -77,9 +76,7 @@ public class FileService {
     }
 
     public Page<MyFile> getAllWithFilter(String[] tags, Pageable pageable) {
-       Page<MyFile> resultList = repository.findAllByTags(new HashSet<>(Arrays.asList(tags)), pageable);
-
-        return resultList;
+       return repository.findAllByTags(Arrays.asList(tags), pageable);
     }
 
     public MyFile getById(String id) {

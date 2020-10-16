@@ -192,21 +192,21 @@ class FileServiceTest {
         assertTrue(result);
     }
 
-//    @Test
-//    void shouldReturnFileListWithPaginatingConditionalsAndFilters() {
-//        Pageable pageable = PageRequest.of(0, 2);
-//        String[] tags = new String[]{"w", "e"};
-//
-//        List<MyFile> resultList = fileService.getAllWithFilter(tags, pageable);
-//
-//        assertThat(resultList).containsExactlyInAnyOrder(FILE_1, FILE_5);
-//
-//        String[] tags1 = new String[]{"r"};
-//
-//        List<MyFile> resultList1 = fileService.getAllWithFilter(tags1, pageable);
-//
-//        assertThat(resultList1).containsExactlyInAnyOrder(FILE_5, FILE_6);
-//    }
+    @Test
+    void shouldReturnFileListWithPaginatingConditionalsAndFilters() {
+        Pageable pageable = PageRequest.of(0, 2);
+        String[] tags = new String[]{"w", "e"};
+
+        List<MyFile> resultList = fileService.getAllWithFilter(tags, pageable).getContent();
+
+        assertThat(resultList).containsExactlyInAnyOrder(FILE_1, FILE_5);
+
+        String[] tags1 = new String[]{"r"};
+
+        List<MyFile> resultList1 = fileService.getAllWithFilter(tags1, pageable).getContent();
+
+        assertThat(resultList1).containsExactlyInAnyOrder(FILE_5, FILE_6);
+    }
 
     private List<MyFile> getData() {
         FILE_1.setTags(Arrays.asList("q", "w", "e"));
