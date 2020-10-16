@@ -2,7 +2,6 @@ package com.example.filestorage.service;
 
 import com.example.filestorage.model.MyFile;
 import com.example.filestorage.repository.FileRepository;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -40,6 +39,7 @@ public class FileService {
         }
 
         repository.save(myFile);
+
         return Optional.empty();
     }
 
@@ -47,7 +47,12 @@ public class FileService {
         if(repository.findById(id).isPresent()) {
             MyFile currentFile = repository.findById(id).get();
 
-            currentFile.setTags(Arrays.asList(tags));
+            for (String tag : tags) {
+                if (!currentFile.getTags().contains(tag)) {
+                    currentFile.addTag(tag);
+                }
+            }
+
             repository.save(currentFile);
 
             return true;

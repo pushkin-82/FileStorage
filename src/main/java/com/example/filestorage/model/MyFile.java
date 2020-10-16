@@ -68,6 +68,10 @@ public class MyFile {
         this.tags.addAll(tags);
     }
 
+    public void addTag(String tag) {
+        this.tags.add(tag);
+    }
+
     public boolean removeTags(Collection<String> tags) {
         for (String tag : tags) {
             if (!this.tags.remove(tag)) {
@@ -101,11 +105,11 @@ public class MyFile {
 
     @Override
     public String toString() {
-        return  "\n      {\n" +
-                "          \"id\": \"" + id + "\",\n" +
-                "          \"name\": \"" + name + "\",\n" +
-                "          \"size\": " + size + ",\n" +
-                "          \"tags\": " + tags + "\n" +
-                "       }";
+        return "MyFile{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", size=" + size +
+                ", tags=" + tags +
+                '}';
     }
 }
