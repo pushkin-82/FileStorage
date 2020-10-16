@@ -34,11 +34,11 @@ class FileControllerTest {
 
     private final static String FILE_1_ID = "128";
 
-    private final MyFile FILE_1 = new MyFile("128", "qwe.qwe", 12000L);
+    private final MyFile FILE_1 = new MyFile("128", "Qwe.qWe", 12000L);
 
     private final MyFile FILE_2 = new MyFile("129dv", "wer.mp3", 123123L);
 
-    private final MyFile FILE_3 = new MyFile("qq", "erty.12f", 12L);
+    private final MyFile FILE_3 = new MyFile("qq", "eqwy.12f", 12L);
 
     private final MyFile FILE_4 = new MyFile("q", "qwe.qwe", 12000L);
 
@@ -213,12 +213,25 @@ class FileControllerTest {
 
     @Test
     void shouldReturnMyFileListDueToFilterAndPaginatingByDefault() throws Exception {
+        FILE_1.setTags(Arrays.asList("q"));
+        FILE_4.setTags(Arrays.asList("q", "w"));
+        FILE_5.setTags(Arrays.asList("r", "w", "e"));
+        FILE_6.setTags(Arrays.asList("q", "w", "e", "r"));
         Pageable pageable = PageRequest.of(0, 10);
         Page<MyFile> files = new PageImpl<>(Arrays.asList(FILE_1, FILE_2, FILE_3, FILE_4, FILE_5, FILE_6));
         when(fileService.getAll(pageable)).thenReturn(files);
 
+        String responseJson = "{\"total\": 6," +
+                "\"page\":[{\"id\": \"129dv\",\"name\": \"wer.mp3\",\"size\": 123123,\"tags\": []}," +
+                            "{\"id\": \"qq\",\"name\": \"eqwy.12f\",\"size\": 12,\"tags\": []}," +
+                            "{\"id\": \"q\",\"name\": \"qwe.qwe\",\"size\": 12000,\"tags\":[\"q\",\"w\"]}," +
+                            "{\"id\": \"a\",\"name\": \"wer.mp3\",\"size\": 123123,\"tags\":[\"r\",\"e\",\"w\"]}," +
+                            "{\"id\": \"z\",\"name\": \"erty.12f\",\"size\": 12,\"tags\":[\"q\",\"r\",\"e\",\"w\"]}," +
+                            "{\"id\": \"128\",\"name\": \"Qwe.qWe\",\"size\": 12000,\"tags\": [\"q\"]}]}";
+
         mockMvc.perform(get(BASE_URL))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().json(responseJson));
     }
 
     @Test
