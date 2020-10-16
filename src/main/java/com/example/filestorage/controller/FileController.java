@@ -123,7 +123,6 @@ public class FileController {
         List<MyFile> resultList = resultPage.getContent();
 
         Map<String, Object> response = new HashMap<>();
-
         response.put("total", resultPage.getTotalElements());
         response.put("page", resultList);
 
