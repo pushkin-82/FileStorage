@@ -1,9 +1,6 @@
 package com.example.filestorage.service;
 
-import com.example.filestorage.extensions.AudioExtension;
-import com.example.filestorage.extensions.DocumentExtension;
-import com.example.filestorage.extensions.ImageExtension;
-import com.example.filestorage.extensions.VideoExtension;
+import com.example.filestorage.extensions.Extension;
 import com.example.filestorage.model.File;
 import com.example.filestorage.repository.FileRepository;
 import com.example.filestorage.service.exception.NoSuchFileException;
@@ -11,10 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -148,7 +147,7 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    private void addDefaultTagsToFile(File file) {
+    private String getExtension(@NonNull File file) {
         String extension = "";
         String fileName = file.getName();
 
@@ -156,15 +155,18 @@ public class FileServiceImpl implements FileService {
             int index = fileName.lastIndexOf('.');
             extension = fileName.substring(index + 1);
         }
-        if (AudioExtension.isInValues(extension)) {
-            file.addTag("audio");
-        } else if (VideoExtension.isInValues(extension)) {
-            file.addTag("video");
-        } else if (DocumentExtension.isInValues(extension)) {
-            file.addTag("document");
-        } else if (ImageExtension.isInValues(extension)) {
-            file.addTag("image");
-        }
+
+        return extension;
+    }
+
+    private void addDefaultTagsToFile(File file) {
+        String extension = getExtension(file);
+
+        Extension.getDefaultTags().forEach((k, v) -> {
+            if (v.contains(extension)) {
+                file.addTag(k);
+            }
+        });
     }
 
 }
