@@ -1,6 +1,6 @@
 package com.example.filestorage.service;
 
-import com.example.filestorage.model.MyFile;
+import com.example.filestorage.model.File;
 import com.example.filestorage.repository.FileRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,43 +23,43 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 class FileServiceTest {
 
-    private final MyFile FILE_1 = new MyFile("128", "Qwe.qWe", 12000L);
+    private final File FILE_1 = new File("128", "Qwe.qWe", 12000L);
 
-    private final MyFile FILE_2 = new MyFile("129dv", "wer.mp3", 123123L);
+    private final File FILE_2 = new File("129dv", "wer.mp3", 123123L);
 
-    private final MyFile FILE_3 = new MyFile("qq", "eqwy.12f", 12L);
+    private final File FILE_3 = new File("qq", "eqwy.12f", 12L);
 
-    private final MyFile FILE_4 = new MyFile("q", "qwe.qwe", 12000L);
+    private final File FILE_4 = new File("q", "qwe.qwe", 12000L);
 
-    private final MyFile FILE_5 = new MyFile("a", "wer.mp3", 123123L);
+    private final File FILE_5 = new File("a", "wer.mp3", 123123L);
 
-    private final MyFile FILE_6 = new MyFile("z", "erty.12f", 12L);
+    private final File FILE_6 = new File("z", "erty.12f", 12L);
 
-    private final MyFile AUDIO_FILE = new MyFile("a", "dfwdc.mp3", 148L);
+    private final File AUDIO_FILE = new File("a", "dfwdc.mp3", 148L);
 
-    private final MyFile VIDEO_FILE = new MyFile("v", "dfwdc.mp4", 148L);
+    private final File VIDEO_FILE = new File("v", "dfwdc.mp4", 148L);
 
-    private final MyFile DOC_FILE = new MyFile("d", "dfwdc.doc", 148L);
+    private final File DOC_FILE = new File("d", "dfwdc.doc", 148L);
 
-    private final MyFile IMAGE_FILE = new MyFile("img", "dfwdc.jpeg", 148L);
+    private final File IMAGE_FILE = new File("img", "dfwdc.jpeg", 148L);
 
-    private final MyFile PLAIN_FILE = new MyFile("plain", "dfwdc.x", 148L);
+    private final File PLAIN_FILE = new File("plain", "dfwdc.x", 148L);
 
-    private  final MyFile NEW_FILE = new MyFile("name.txt", 121L);
+    private  final File NEW_FILE = new File("name.txt", 121L);
 
-    private final MyFile NEW_FILE_BLANK_NAME = new MyFile("   ", 127L);
+    private final File NEW_FILE_BLANK_NAME = new File("   ", 127L);
 
-    private final MyFile NEW_FILE_WRONG_SIZE = new MyFile("qwe.qwe", -1L);
+    private final File NEW_FILE_WRONG_SIZE = new File("qwe.qwe", -1L);
 
-    private final MyFile UPLOAD_FILE_1 = new MyFile("ZZZZ.txt", 123L);
+    private final File UPLOAD_FILE_1 = new File("ZZZZ.txt", 123L);
 
-    private final MyFile UPLOAD_FILE_2 = new MyFile("тЕсТ.txt", 123L);
+    private final File UPLOAD_FILE_2 = new File("тЕсТ.txt", 123L);
 
-    private final MyFile UPLOAD_FILE_3 = new MyFile("test", 123L);
+    private final File UPLOAD_FILE_3 = new File("test", 123L);
 
-    private final MyFile UPLOAD_FILE_4 = new MyFile("test.txt", 0L);
+    private final File UPLOAD_FILE_4 = new File("test.txt", 0L);
 
-    private final MyFile UPLOAD_FILE_5 = new MyFile("aaa.txt", null);
+    private final File UPLOAD_FILE_5 = new File("aaa.txt", null);
 
     @Autowired
     ElasticsearchRestTemplate elasticsearchRestTemplate;
@@ -72,7 +72,7 @@ class FileServiceTest {
 
     @BeforeEach
     void setUp() {
-        IndexOperations operations = elasticsearchRestTemplate.indexOps(MyFile.class);
+        IndexOperations operations = elasticsearchRestTemplate.indexOps(File.class);
         operations.delete();
         operations.create();
         fileRepository.saveAll(getData());
@@ -152,7 +152,7 @@ class FileServiceTest {
 
         assertTrue(result);
 
-        MyFile updated = fileService.getById("qq");
+        File updated = fileService.getById("qq");
         assertThat(updated.getTags()).containsExactlyInAnyOrder("a", "s", "d");
     }
 
@@ -163,7 +163,7 @@ class FileServiceTest {
 
         assertTrue(result);
 
-        MyFile updated = fileService.getById("128");
+        File updated = fileService.getById("128");
         assertThat(updated.getTags()).containsExactlyInAnyOrder("a", "s", "d", "q", "w", "e");
     }
 
@@ -207,13 +207,13 @@ class FileServiceTest {
         Pageable pageable = PageRequest.of(0, 2);
         String[] tags = new String[]{"w", "e"};
 
-        List<MyFile> resultList = fileService.getAllByTags(tags, pageable).getContent();
+        List<File> resultList = fileService.getAllByTags(tags, pageable).getContent();
 
         assertThat(resultList).containsExactlyInAnyOrder(FILE_1, FILE_5);
 
         String[] tags1 = new String[]{"r"};
 
-        List<MyFile> resultList1 = fileService.getAllByTags(tags1, pageable).getContent();
+        List<File> resultList1 = fileService.getAllByTags(tags1, pageable).getContent();
 
         assertThat(resultList1).containsExactlyInAnyOrder(FILE_5, FILE_6);
     }
@@ -223,7 +223,7 @@ class FileServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         String template = "qw";
 
-        List<MyFile> resultList = fileService.getAllByNameContaining(template, pageable).getContent();
+        List<File> resultList = fileService.getAllByNameContaining(template, pageable).getContent();
 
         assertThat(resultList).containsExactlyInAnyOrder(FILE_1, FILE_4, FILE_3);
     }
@@ -234,7 +234,7 @@ class FileServiceTest {
         String[] tags = new String[]{"w", "e"};
         String template = "qw";
 
-        List<MyFile> resultList = fileService.getAllByTagsAndNameContaining(tags, template, pageable).getContent();
+        List<File> resultList = fileService.getAllByTagsAndNameContaining(tags, template, pageable).getContent();
 
         assertThat(resultList).containsExactlyInAnyOrder(FILE_1);
     }
@@ -243,7 +243,7 @@ class FileServiceTest {
     void shouldAddAudioTagWhenUploadWithProperExtension() {
         fileService.uploadFile(AUDIO_FILE);
 
-        MyFile expected = fileService.getById("a");
+        File expected = fileService.getById("a");
 
         assertThat(expected.getTags()).containsExactlyInAnyOrder("audio");
     }
@@ -252,7 +252,7 @@ class FileServiceTest {
     void shouldAddVideoTagWhenUploadWithProperExtension() {
         fileService.uploadFile(VIDEO_FILE);
 
-        MyFile expected = fileService.getById("v");
+        File expected = fileService.getById("v");
 
         assertThat(expected.getTags()).containsExactlyInAnyOrder("video");
     }
@@ -261,7 +261,7 @@ class FileServiceTest {
     void shouldAddDocumentTagWhenUploadWithProperExtension() {
         fileService.uploadFile(DOC_FILE);
 
-        MyFile expected = fileService.getById("d");
+        File expected = fileService.getById("d");
 
         assertThat(expected.getTags()).containsExactlyInAnyOrder("document");
     }
@@ -270,7 +270,7 @@ class FileServiceTest {
     void shouldAddImageTagWhenUploadWithProperExtension() {
         fileService.uploadFile(IMAGE_FILE);
 
-        MyFile expected = fileService.getById("img");
+        File expected = fileService.getById("img");
 
         assertThat(expected.getTags()).containsExactlyInAnyOrder("image");
     }
@@ -279,16 +279,16 @@ class FileServiceTest {
     void shouldNotAddTagsWhenUploadWithNotProperExtension() {
         fileService.uploadFile(PLAIN_FILE);
 
-        MyFile expected = fileService.getById("plain");
+        File expected = fileService.getById("plain");
 
         assertThat(expected.getTags()).isEmpty();
     }
 
-    private List<MyFile> getData() {
-        FILE_1.setTags(Arrays.asList("q", "w", "e"));
-        FILE_4.setTags(Arrays.asList("q", "w"));
-        FILE_5.setTags(Arrays.asList("r", "w", "e"));
-        FILE_6.setTags(Arrays.asList("q", "w", "e", "r"));
+    private List<File> getData() {
+        FILE_1.addTags(Arrays.asList("q", "w", "e"));
+        FILE_4.addTags(Arrays.asList("q", "w"));
+        FILE_5.addTags(Arrays.asList("r", "w", "e"));
+        FILE_6.addTags(Arrays.asList("q", "w", "e", "r"));
         return new ArrayList<>(Arrays.asList(FILE_1, FILE_2, FILE_3, FILE_4, FILE_5, FILE_6));
     }
 }

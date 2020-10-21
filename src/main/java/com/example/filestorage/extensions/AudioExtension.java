@@ -4,7 +4,7 @@ public enum AudioExtension implements Extension {
     MP3 ("mp3"),
     FLAC("flac");
 
-    private String title;
+    private final String title;
 
     AudioExtension(String title) {
         this.title = title;

@@ -2,8 +2,6 @@ package com.example.filestorage.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -11,7 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Document(indexName = "file")
-public class MyFile {
+public class File {
 
     @Id
     private String id;
@@ -20,27 +18,26 @@ public class MyFile {
 
     private Long size;
 
-    @Field(type = FieldType.Nested, includeInParent = true)
-    private Set<String> tags = new HashSet<>();
+    private final Set<String> tags = new HashSet<>();
 
-    public MyFile() {
+    public File() {
     }
 
-    public MyFile(String name, Long size) {
+    public File(String name, Long size) {
         this(null, name, size);
     }
 
-    public MyFile(String id, String name, Long size) {
+    public File(String id, String name, Long size) {
         this.id = id;
         this.name = name;
         this.size = size;
     }
 
-    public MyFile(String id, String name, Long size, Collection<String> tags) {
+    public File(String id, String name, Long size, Collection<String> tags) {
         this.id = id;
         this.name = name;
         this.size = size;
-        setTags(tags);
+        addTags(tags);
     }
 
     public String getId() {
@@ -71,7 +68,7 @@ public class MyFile {
         return tags;
     }
 
-    public void setTags(Collection<String> tags) {
+    public void addTags(Collection<String> tags) {
         this.tags.addAll(tags);
     }
 
@@ -97,12 +94,12 @@ public class MyFile {
             return false;
         }
 
-        MyFile myFile = (MyFile) o;
+        File file = (File) o;
 
-        return Objects.equals(id, myFile.id)
-                && Objects.equals(name, myFile.name)
-                && Objects.equals(size, myFile.size)
-                && Objects.equals(tags, myFile.tags);
+        return Objects.equals(id, file.id)
+                && Objects.equals(name, file.name)
+                && Objects.equals(size, file.size)
+                && Objects.equals(tags, file.tags);
     }
 
     @Override
@@ -112,7 +109,7 @@ public class MyFile {
 
     @Override
     public String toString() {
-        return "MyFile{" +
+        return "File{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", size=" + size +

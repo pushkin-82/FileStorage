@@ -1,27 +1,27 @@
 package com.example.filestorage.service;
 
-import com.example.filestorage.model.MyFile;
+import com.example.filestorage.model.File;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
 public interface FileService {
-    Optional<String> uploadFile(MyFile myFile);
+    Optional<String> uploadFile(File file);
 
     boolean assignTags(String id, String[] tags);
 
     boolean removeTags(String id, String[] tags);
 
-    Page<MyFile> getAll(Pageable pageable);
+    Page<File> getAll(Pageable pageable);
 
-    Page<MyFile> getAllByTags(String[] tags, Pageable pageable);
+    Page<File> getAllByTags(String[] tags, Pageable pageable);
 
-    Page<MyFile> getAllByNameContaining(String template, Pageable pageable);
+    Page<File> getAllByNameContaining(String template, Pageable pageable);
 
-    Page<MyFile> getAllByTagsAndNameContaining(String[] tags, String template, Pageable pageable);
+    Page<File> getAllByTagsAndNameContaining(String[] tags, String template, Pageable pageable);
 
-    MyFile getById(String id);
+    File getById(String id);
 
     boolean deleteById(String id);
 }

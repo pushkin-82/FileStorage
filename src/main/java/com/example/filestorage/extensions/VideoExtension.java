@@ -3,7 +3,7 @@ package com.example.filestorage.extensions;
 public enum VideoExtension implements Extension {
     MP4("mp4");
 
-    private String title;
+    private final String title;
 
     VideoExtension(String title) {
         this.title = title;

@@ -1,6 +1,6 @@
 package com.example.filestorage.controller;
 
-import com.example.filestorage.model.MyFile;
+import com.example.filestorage.model.File;
 import com.example.filestorage.service.FileService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,21 +28,21 @@ public class FileController {
     }
 
     @GetMapping("/{id}")
-    public MyFile getById(@PathVariable("id") String id) {
+    public File getById(@PathVariable("id") String id) {
         return fileService.getById(id);
     }
 
     @PostMapping(consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> uploadFile(@RequestBody MyFile myFile) {
+    public ResponseEntity<Object> uploadFile(@RequestBody File file) {
         Map<String, Object> response = new HashMap<>();
 
-        if (fileService.uploadFile(myFile).isEmpty()) {
-            response.put("id", myFile.getId());
+        if (fileService.uploadFile(file).isEmpty()) {
+            response.put("id", file.getId());
 
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             response.put(SUCCESS, false);
-            response.put(ERROR, fileService.uploadFile(myFile).get());
+            response.put(ERROR, fileService.uploadFile(file).get());
 
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST );
         }
@@ -104,7 +104,7 @@ public class FileController {
                                                      @RequestParam(defaultValue = "10") int size,
                                                      @RequestParam(required = false) String q) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<MyFile> resultPage;
+        Page<File> resultPage;
 
         if (tags == null) {
             if (q == null) {
@@ -120,7 +120,7 @@ public class FileController {
             }
         }
 
-        List<MyFile> resultList = resultPage.getContent();
+        List<File> resultList = resultPage.getContent();
 
         Map<String, Object> response = new HashMap<>();
         response.put("total", resultPage.getTotalElements());

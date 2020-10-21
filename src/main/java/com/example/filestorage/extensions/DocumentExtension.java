@@ -3,7 +3,7 @@ package com.example.filestorage.extensions;
 public enum DocumentExtension implements Extension {
     DOC("doc");
 
-    private String title;
+    private final String title;
 
     DocumentExtension(String title) {
         this.title = title;

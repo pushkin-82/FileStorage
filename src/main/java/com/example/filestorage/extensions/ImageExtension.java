@@ -3,7 +3,7 @@ package com.example.filestorage.extensions;
 public enum ImageExtension implements Extension {
     JPEG("jpeg");
 
-    private String title;
+    private final String title;
 
     ImageExtension(String title) {
         this.title = title;

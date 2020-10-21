@@ -1,6 +1,6 @@
 package com.example.filestorage.controller;
 
-import com.example.filestorage.model.MyFile;
+import com.example.filestorage.model.File;
 import com.example.filestorage.service.FileService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -34,23 +34,23 @@ class FileControllerTest {
 
     private final static String FILE_1_ID = "128";
 
-    private final MyFile FILE_1 = new MyFile("128", "Qwe.qWe", 12000L);
+    private final File FILE_1 = new File("128", "Qwe.qWe", 12000L);
 
-    private final MyFile FILE_2 = new MyFile("129dv", "wer.mp3", 123123L);
+    private final File FILE_2 = new File("129dv", "wer.mp3", 123123L);
 
-    private final MyFile FILE_3 = new MyFile("qq", "eqwy.12f", 12L);
+    private final File FILE_3 = new File("qq", "eqwy.12f", 12L);
 
-    private final MyFile FILE_4 = new MyFile("q", "qwe.qwe", 12000L);
+    private final File FILE_4 = new File("q", "qwe.qwe", 12000L);
 
-    private final MyFile FILE_5 = new MyFile("a", "wer.mp3", 123123L);
+    private final File FILE_5 = new File("a", "wer.mp3", 123123L);
 
-    private final MyFile FILE_6 = new MyFile("z", "erty.12f", 12L);
+    private final File FILE_6 = new File("z", "erty.12f", 12L);
 
-    private final MyFile NEW_FILE_BLANK_NAME = new MyFile("   ", 127L);
+    private final File NEW_FILE_BLANK_NAME = new File("   ", 127L);
 
-    private final MyFile NEW_FILE_WRONG_SIZE = new MyFile("qwe.qwe", -1L);
+    private final File NEW_FILE_WRONG_SIZE = new File("qwe.qwe", -1L);
 
-    private final MyFile UPLOAD_FILE_5 = new MyFile("aaa.txt", null);
+    private final File UPLOAD_FILE_5 = new File("aaa.txt", null);
 
     private final static String[] TAGS = new String[]{"q", "w", "e"};
 
@@ -88,7 +88,7 @@ class FileControllerTest {
 
     @Test
     void shouldUploadFileAndReturnHttpStatusOk() throws Exception {
-        MyFile expected = FILE_1;
+        File expected = FILE_1;
         when(fileService.uploadFile(expected)).thenReturn(Optional.empty());
         String jsonBody = objectMapper.writeValueAsString(expected);
         String responseJson = "{\"id\":\"128\"}";
@@ -213,12 +213,12 @@ class FileControllerTest {
 
     @Test
     void shouldReturnMyFileListDueToFilterAndPaginatingByDefault() throws Exception {
-        FILE_1.setTags(Arrays.asList("q"));
-        FILE_4.setTags(Arrays.asList("q", "w"));
-        FILE_5.setTags(Arrays.asList("r", "w", "e"));
-        FILE_6.setTags(Arrays.asList("q", "w", "e", "r"));
+        FILE_1.addTags(Arrays.asList("q"));
+        FILE_4.addTags(Arrays.asList("q", "w"));
+        FILE_5.addTags(Arrays.asList("r", "w", "e"));
+        FILE_6.addTags(Arrays.asList("q", "w", "e", "r"));
         Pageable pageable = PageRequest.of(0, 10);
-        Page<MyFile> files = new PageImpl<>(Arrays.asList(FILE_1, FILE_2, FILE_3, FILE_4, FILE_5, FILE_6));
+        Page<File> files = new PageImpl<>(Arrays.asList(FILE_1, FILE_2, FILE_3, FILE_4, FILE_5, FILE_6));
         when(fileService.getAll(pageable)).thenReturn(files);
 
         String responseJson = "{\"total\": 6," +
@@ -238,11 +238,11 @@ class FileControllerTest {
     void shouldReturnMyFileListDueToFilterAndPaginating() throws Exception {
         Pageable pageable = PageRequest.of(1, 2);
         String[] tags = new String[]{"w", "e"};
-        FILE_1.setTags(Arrays.asList("q", "w", "e"));
-        FILE_4.setTags(Arrays.asList("q", "w"));
-        FILE_5.setTags(Arrays.asList("r", "w", "e"));
-        FILE_6.setTags(Arrays.asList("q", "w", "e", "r"));
-        Page<MyFile> files = new PageImpl<>(Arrays.asList(FILE_6));
+        FILE_1.addTags(Arrays.asList("q", "w", "e"));
+        FILE_4.addTags(Arrays.asList("q", "w"));
+        FILE_5.addTags(Arrays.asList("r", "w", "e"));
+        FILE_6.addTags(Arrays.asList("q", "w", "e", "r"));
+        Page<File> files = new PageImpl<>(Arrays.asList(FILE_6));
 
         when(fileService.getAllByTags(tags, pageable)).thenReturn(files);
 
@@ -254,7 +254,7 @@ class FileControllerTest {
     void shouldReturnMyFileListByNameContainingTemplateDueToFilterAndPaginatingByDefault() throws Exception {
         Pageable pageable = PageRequest.of(0, 10);
         String q = "qw";
-        Page<MyFile> files = new PageImpl<>(Arrays.asList(FILE_1, FILE_2, FILE_3, FILE_4, FILE_5, FILE_6));
+        Page<File> files = new PageImpl<>(Arrays.asList(FILE_1, FILE_2, FILE_3, FILE_4, FILE_5, FILE_6));
         when(fileService.getAllByNameContaining(q, pageable)).thenReturn(files);
 
         mockMvc.perform(get(BASE_URL + "?q=qw"))
@@ -266,11 +266,11 @@ class FileControllerTest {
         Pageable pageable = PageRequest.of(1, 2);
         String q = "qw";
         String[] tags = new String[]{"w", "e"};
-        FILE_1.setTags(Arrays.asList("q", "w", "e"));
-        FILE_4.setTags(Arrays.asList("q", "w"));
-        FILE_5.setTags(Arrays.asList("r", "w", "e"));
-        FILE_6.setTags(Arrays.asList("q", "w", "e", "r"));
-        Page<MyFile> files = new PageImpl<>(Arrays.asList(FILE_6));
+        FILE_1.addTags(Arrays.asList("q", "w", "e"));
+        FILE_4.addTags(Arrays.asList("q", "w"));
+        FILE_5.addTags(Arrays.asList("r", "w", "e"));
+        FILE_6.addTags(Arrays.asList("q", "w", "e", "r"));
+        Page<File> files = new PageImpl<>(Arrays.asList(FILE_6));
 
         when(fileService.getAllByTagsAndNameContaining(tags, q, pageable)).thenReturn(files);
 
