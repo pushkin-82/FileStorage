@@ -1,4 +1,4 @@
-package com.example.filestorage.extensions;
+package com.example.filestorage.constants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class Extension {
+public final class Extensions {
 
     private static final Map<String, List<String>> defaultTags = new HashMap<>();
 
@@ -22,7 +22,7 @@ public final class Extension {
         defaultTags.put("image", imageExt);
     }
 
-    private Extension() {
+    private Extensions() {
     }
 
     public static Map<String, List<String>> getDefaultTags() {

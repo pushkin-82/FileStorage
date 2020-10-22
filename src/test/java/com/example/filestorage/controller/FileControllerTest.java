@@ -219,7 +219,7 @@ class FileControllerTest {
         FILE_6.addTags(Arrays.asList("q", "w", "e", "r"));
         Pageable pageable = PageRequest.of(0, 10);
         Page<File> files = new PageImpl<>(Arrays.asList(FILE_1, FILE_2, FILE_3, FILE_4, FILE_5, FILE_6));
-        when(fileService.getAll(pageable)).thenReturn(files);
+        when(fileService.getAllByTagsAndNameContaining(null, null, pageable)).thenReturn(files);
 
         String responseJson = "{\"total\": 6," +
                 "\"page\":[{\"id\": \"129dv\",\"name\": \"wer.mp3\",\"size\": 123123,\"tags\": []}," +
@@ -244,7 +244,7 @@ class FileControllerTest {
         FILE_6.addTags(Arrays.asList("q", "w", "e", "r"));
         Page<File> files = new PageImpl<>(Arrays.asList(FILE_6));
 
-        when(fileService.getAllByTags(tags, pageable)).thenReturn(files);
+        when(fileService.getAllByTagsAndNameContaining(tags, null, pageable)).thenReturn(files);
 
         mockMvc.perform(get(BASE_URL + "?tags=w,e&page=1&size=2"))
                 .andExpect(status().isOk());
@@ -255,7 +255,7 @@ class FileControllerTest {
         Pageable pageable = PageRequest.of(0, 10);
         String q = "qw";
         Page<File> files = new PageImpl<>(Arrays.asList(FILE_1, FILE_2, FILE_3, FILE_4, FILE_5, FILE_6));
-        when(fileService.getAllByNameContaining(q, pageable)).thenReturn(files);
+        when(fileService.getAllByTagsAndNameContaining(null, q, pageable)).thenReturn(files);
 
         mockMvc.perform(get(BASE_URL + "?q=qw"))
                 .andExpect(status().isOk());

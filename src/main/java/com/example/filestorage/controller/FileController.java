@@ -114,19 +114,7 @@ public class FileController {
         Pageable pageable = PageRequest.of(page, size);
         Page<File> resultPage;
 
-        if (tags == null) {
-            if (q == null) {
-                resultPage = fileService.getAll(pageable);
-            } else {
-                resultPage = fileService.getAllByNameContaining(q, pageable);
-            }
-        } else {
-            if (q == null) {
-                resultPage = fileService.getAllByTags(tags, pageable);
-            } else {
-                resultPage = fileService.getAllByTagsAndNameContaining(tags, q, pageable);
-            }
-        }
+        resultPage = fileService.getAllByTagsAndNameContaining(tags, q, pageable);
 
         List<File> resultList = resultPage.getContent();
 

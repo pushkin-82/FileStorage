@@ -1,6 +1,6 @@
 package com.example.filestorage.service;
 
-import com.example.filestorage.extensions.Extension;
+import com.example.filestorage.constants.Extensions;
 import com.example.filestorage.model.File;
 import com.example.filestorage.repository.FileRepository;
 import com.example.filestorage.service.exception.NoSuchFileException;
@@ -9,11 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -119,11 +119,25 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public Page<File> getAllByTagsAndNameContaining(String[] tags, String template, Pageable pageable) {
+    public Page<File> getAllByTagsAndNameContaining(@Nullable String[] tags, @Nullable String template, Pageable pageable) {
         LOG.debug("In getAllByNameContaining receive files that contain tags and " +
                 "with name that contains template with paginating");
 
-        return repository.findAllByTagsAndNameContaining(Arrays.asList(tags), template, pageable);
+        Page<File> resultPage;
+        if (tags == null) {
+            if (template == null) {
+                resultPage = repository.findAll(pageable);
+            } else {
+                resultPage = repository.findAllByNameContaining(template, pageable);
+            }
+        } else {
+            if (template == null) {
+                resultPage = repository.findAllByTags(Arrays.asList(tags), pageable);
+            } else {
+                resultPage = repository.findAllByTagsAndNameContaining(Arrays.asList(tags), template, pageable);
+            }
+        }
+        return resultPage;
     }
 
     @Override
@@ -162,7 +176,7 @@ public class FileServiceImpl implements FileService {
     private void addDefaultTagsToFile(File file) {
         String extension = getExtension(file);
 
-        Extension.getDefaultTags().forEach((k, v) -> {
+        Extensions.getDefaultTags().forEach((k, v) -> {
             if (v.contains(extension)) {
                 file.addTag(k);
             }
