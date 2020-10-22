@@ -1,6 +1,6 @@
 package com.example.filestorage.service;
 
-import com.example.filestorage.constants.Extensions;
+import com.example.filestorage.constants.Constants;
 import com.example.filestorage.model.File;
 import com.example.filestorage.repository.FileRepository;
 import com.example.filestorage.service.exception.NoSuchFileException;
@@ -176,7 +176,7 @@ public class FileServiceImpl implements FileService {
     private void addDefaultTagsToFile(File file) {
         String extension = getExtension(file);
 
-        Extensions.getDefaultTags().forEach((k, v) -> {
+        Constants.DEFAULT_TAGS.getDefaultTags().forEach((k, v) -> {
             if (v.contains(extension)) {
                 file.addTag(k);
             }
