@@ -21,7 +21,7 @@ public interface FileService {
 
     Page<File> getAllByTagsAndNameContaining(String[] tags, String template, Pageable pageable);
 
-    File getById(String id);
+    Optional<File> getById(String id);
 
     boolean deleteById(String id);
 }

@@ -152,7 +152,7 @@ class FileServiceTest {
 
         assertTrue(result);
 
-        File updated = fileService.getById("qq");
+        File updated = fileService.getById("qq").get();
         assertThat(updated.getTags()).containsExactlyInAnyOrder("a", "s", "d");
     }
 
@@ -163,7 +163,7 @@ class FileServiceTest {
 
         assertTrue(result);
 
-        File updated = fileService.getById("128");
+        File updated = fileService.getById("128").get();
         assertThat(updated.getTags()).containsExactlyInAnyOrder("a", "s", "d", "q", "w", "e");
     }
 
@@ -243,7 +243,7 @@ class FileServiceTest {
     void shouldAddAudioTagWhenUploadWithProperExtension() {
         fileService.uploadFile(AUDIO_FILE);
 
-        File expected = fileService.getById("a");
+        File expected = fileService.getById("a").get();
 
         assertThat(expected.getTags()).containsExactlyInAnyOrder("audio");
     }
@@ -252,7 +252,7 @@ class FileServiceTest {
     void shouldAddVideoTagWhenUploadWithProperExtension() {
         fileService.uploadFile(VIDEO_FILE);
 
-        File expected = fileService.getById("v");
+        File expected = fileService.getById("v").get();
 
         assertThat(expected.getTags()).containsExactlyInAnyOrder("video");
     }
@@ -261,7 +261,7 @@ class FileServiceTest {
     void shouldAddDocumentTagWhenUploadWithProperExtension() {
         fileService.uploadFile(DOC_FILE);
 
-        File expected = fileService.getById("d");
+        File expected = fileService.getById("d").get();
 
         assertThat(expected.getTags()).containsExactlyInAnyOrder("document");
     }
@@ -270,7 +270,7 @@ class FileServiceTest {
     void shouldAddImageTagWhenUploadWithProperExtension() {
         fileService.uploadFile(IMAGE_FILE);
 
-        File expected = fileService.getById("img");
+        File expected = fileService.getById("img").get();
 
         assertThat(expected.getTags()).containsExactlyInAnyOrder("image");
     }
@@ -279,7 +279,7 @@ class FileServiceTest {
     void shouldNotAddTagsWhenUploadWithNotProperExtension() {
         fileService.uploadFile(PLAIN_FILE);
 
-        File expected = fileService.getById("plain");
+        File expected = fileService.getById("plain").get();
 
         assertThat(expected.getTags()).isEmpty();
     }

@@ -66,7 +66,7 @@ public class FileServiceImpl implements FileService {
         LOG.debug("In assignTags add new tags to file with id={}", id);
 
         if(repository.findById(id).isPresent()) {
-            File currentFile = getById(id);
+            File currentFile = getById(id).get();
 
             for (String tag : tags) {
                 if (!currentFile.getTags().contains(tag)) {
@@ -86,7 +86,7 @@ public class FileServiceImpl implements FileService {
         LOG.debug("In removeTags remove tags from file with id={}", id);
 
         if (repository.findById(id).isPresent()) {
-            File current = getById(id);
+            File current = getById(id).get();
 
             boolean result = current.removeTags(Arrays.asList(tags));
 
@@ -141,11 +141,14 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public File getById(String id) {
+    public Optional<File> getById(String id) {
         LOG.debug("In getById find file with id: {}", id);
 
-        return repository.findById(id)
-                .orElseThrow(() -> new NoSuchFileException(format("No file with id:%s was found", id)));
+        if (repository.existsById(id)) {
+            return repository.findById(id);
+        }
+
+        return Optional.empty();
     }
 
     @Override

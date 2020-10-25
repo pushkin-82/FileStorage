@@ -1,5 +1,6 @@
 package com.example.filestorage.controller;
 
+import com.example.filestorage.dto.ResponseDto;
 import com.example.filestorage.model.File;
 import com.example.filestorage.service.FileService;
 import org.springframework.data.domain.Page;
@@ -16,112 +17,119 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/file")
 public class FileController {
 
-    private static final String SUCCESS = "success";
+  private static final String SUCCESS = "success";
 
-    private static final String ERROR = "error";
+  private static final String ERROR = "error";
 
-    private final FileService fileService;
+  private final FileService fileService;
 
-    public FileController(FileService fileService) {
-        this.fileService = fileService;
+  public FileController(FileService fileService) {
+    this.fileService = fileService;
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<Object> getById(@PathVariable("id") String id) {
+    Optional<File> result = fileService.getById(id);
+
+    if (result.isEmpty()) {
+      return new ResponseEntity<>(new ResponseDto(false, "file not found"), HttpStatus.NOT_FOUND);
+    } else {
+      return new ResponseEntity<>(result, HttpStatus.OK);
     }
+  }
 
-    @GetMapping("/{id}")
-    public File getById(@PathVariable("id") String id) {
-        return fileService.getById(id);
+  @PostMapping(consumes = "application/json", produces = "application/json")
+  public ResponseEntity<Object> uploadFile(@RequestBody File file) {
+    Map<String, Object> response = new HashMap<>();
+
+    if (fileService.uploadFile(file).isEmpty()) {
+      response.put("id", file.getId());
+
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    } else {
+      response.put(SUCCESS, false);
+      response.put(ERROR, fileService.uploadFile(file).get());
+
+      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+  }
 
-    @PostMapping(consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> uploadFile(@RequestBody File file) {
-        Map<String, Object> response = new HashMap<>();
+  @DeleteMapping(value = "/{id}", produces = "application/json")
+  public ResponseEntity<Object> deleteFile(@PathVariable("id") String id) {
+    Map<String, Object> response = new HashMap<>();
 
-        if (fileService.uploadFile(file).isEmpty()) {
-            response.put("id", file.getId());
+    if (fileService.deleteById(id)) {
+      response.put(SUCCESS, true);
 
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } else {
-            response.put(SUCCESS, false);
-            response.put(ERROR, fileService.uploadFile(file).get());
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    } else {
+      response.put(SUCCESS, false);
+      response.put(ERROR, "file not found");
 
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST );
-        }
+      return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
+  }
 
-    @DeleteMapping(value = "/{id}", produces = "application/json")
-    public ResponseEntity<Object> deleteFile(@PathVariable("id") String id) {
-        Map<String, Object> response = new HashMap<>();
+  @PostMapping(value = "/{id}/tags", consumes = "application/json", produces = "application/json")
+  public ResponseEntity<Object> assignTags(
+      @PathVariable("id") String id, @RequestBody String[] tags) {
+    Map<String, Object> response = new HashMap<>();
 
-        if (fileService.deleteById(id)) {
-            response.put(SUCCESS, true);
+    if (fileService.assignTags(id, tags)) {
+      response.put(SUCCESS, true);
 
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } else {
-            response.put(SUCCESS, false);
-            response.put(ERROR, "file not found");
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    } else {
+      response.put(SUCCESS, false);
+      response.put(ERROR, "file not found");
 
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
+      return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
+  }
 
-    @PostMapping(value = "/{id}/tags", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> assignTags(@PathVariable("id") String id,
-                                             @RequestBody String[] tags) {
-        Map<String, Object> response = new HashMap<>();
+  @DeleteMapping(value = "/{id}/tags", consumes = "application/json", produces = "application/json")
+  public ResponseEntity<Object> removeTags(
+      @PathVariable("id") String id, @RequestBody String[] tags) {
+    Map<String, Object> response = new HashMap<>();
 
-        if (fileService.assignTags(id, tags)) {
-            response.put(SUCCESS, true);
+    if (fileService.removeTags(id, tags)) {
+      response.put(SUCCESS, true);
 
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } else {
-            response.put(SUCCESS, false);
-            response.put(ERROR, "file not found");
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    } else {
+      response.put(SUCCESS, false);
+      response.put(ERROR, "tag not found on file");
 
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
+      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+  }
 
-    @DeleteMapping(value = "/{id}/tags", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> removeTags(@PathVariable("id") String id,
-                                             @RequestBody String[] tags) {
-        Map<String, Object> response = new HashMap<>();
+  @GetMapping(produces = "application/json")
+  public ResponseEntity<Object> getFilesWithFilter(
+      @RequestParam(required = false) String[] tags,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size,
+      @RequestParam(required = false) String q) {
+    Pageable pageable = PageRequest.of(page, size);
+    Page<File> resultPage;
 
-        if (fileService.removeTags(id, tags)) {
-            response.put(SUCCESS, true);
+    resultPage = fileService.getAllByTagsAndNameContaining(tags, q, pageable);
 
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } else {
-            response.put(SUCCESS, false);
-            response.put(ERROR, "tag not found on file");
+    List<File> resultList = resultPage.getContent();
 
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-    }
+    Map<String, Object> response = new HashMap<>();
+    response.put("total", resultPage.getTotalElements());
+    response.put("page", resultList);
 
-    @GetMapping(produces = "application/json")
-    public ResponseEntity<Object> getFilesWithFilter(@RequestParam(required = false) String[] tags,
-                                                     @RequestParam(defaultValue = "0") int page,
-                                                     @RequestParam(defaultValue = "10") int size,
-                                                     @RequestParam(required = false) String q) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<File> resultPage;
-
-        resultPage = fileService.getAllByTagsAndNameContaining(tags, q, pageable);
-
-        List<File> resultList = resultPage.getContent();
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("total", resultPage.getTotalElements());
-        response.put("page", resultList);
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+    return new ResponseEntity<>(response, HttpStatus.OK);
+  }
 }

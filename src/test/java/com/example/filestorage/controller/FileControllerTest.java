@@ -277,4 +277,26 @@ class FileControllerTest {
         mockMvc.perform(get(BASE_URL + "?tags=w,e&page=1&size=2&q=qw"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    void shouldReturnFileByIdAndReturnHttpStatusOk() throws Exception {
+        File expected = FILE_1;
+        when(fileService.getById("128")).thenReturn(Optional.of(expected));
+
+        String responseJson = objectMapper.writeValueAsString(expected);
+
+        mockMvc.perform(get(BASE_URL + "/{id}", FILE_1_ID))
+                .andExpect(status().isOk())
+                .andExpect(content().json(responseJson));
+    }
+
+    @Test
+    void shouldReturnHttpStatusNotFoundWhenGetFileThatNotExists() throws Exception {
+        String responseJson = "{\n \"success\": false,\n" +
+                "  \"error\": \"file not found\"\n}\n";
+
+        mockMvc.perform(get(BASE_URL + "/{id}", FILE_1_ID))
+                .andExpect(status().isNotFound())
+                .andExpect(content().json(responseJson));
+    }
 }
